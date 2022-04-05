@@ -7,6 +7,8 @@ let currentlyOpenedGroup;
 // Make a new object. This is the base call that will call further functions to construct the final object
 function MakeElement(currentObj) {
     let group = two.makeGroup();
+    group.id = "flow Group";
+
     group.position.x = currentObj.groupPositionOffset.x;
     group.position.y = currentObj.groupPositionOffset.y;
 
@@ -21,6 +23,7 @@ function MakeElement(currentObj) {
 // draw object box from object data
 function CreateElement(group, currentObj) {
     let rect = two.makeRectangle(0, 0, 50, 50);
+    rect.id = "rect";
     two.update();
     group._renderer.elem.addEventListener('click', (e) => {two.update(); selectElement(group);}, false);
     group.add(rect);
@@ -38,14 +41,17 @@ function CreateElementDetails(group, currentObj) {
 
 
     let nameTextObject = new Two.Text(nameText, 0, - 10, 'normal');
+    nameTextObject.id = "";
     nameTextObject.size = 10;
     detailArray.push(nameTextObject);
 
     let IdTextObject = new Two.Text("ID: " + IdText, 0, 0, 'normal');
+    IdTextObject.id = "";
     IdTextObject.size = 10;
     detailArray.push(IdTextObject);
 
     let testTextObject = new Two.Text("test: " + TestText, 0, 10, 'normal');
+    testTextObject.id = "";
     testTextObject.size = 10;
     detailArray.push(testTextObject);
 
@@ -65,7 +71,7 @@ function CreateElementConnectionArrow(currentObj) {
     for (let j = 0; j < max; j++) {
         let obj = globalObjectsArray[j].data;
         let lineObj = two.makeLine(currentObj.groupPositionOffset.x, currentObj.groupPositionOffset.y, obj.groupPositionOffset.x, obj.groupPositionOffset.y);
-
+        lineObj.id = "Connection Line";
         // stage.add(lineObj);
         connections.add(lineObj);
     }
@@ -160,29 +166,22 @@ function MakeAppElement(currentObjData) {
     let groupExist = CheckAppExists(currentObjData.appID); // this is here because want to check for apps that already exist in globalObjectsArray. If it was after it would always find the app when it doesn't exist
     let group;// = GetAppGroup(currentObj.appID)
     if (groupExist) {
-        group = GetAppGroup(currentObjData).object;
+        group = GetAppGroup(currentObjData).object.parent;
     } else {
         group = two.makeGroup();
-        
+        group.id = "App Group";
+
         group.position.x = currentObjData.groupPositionOffset.x;
         group.position.y = currentObjData.groupPositionOffset.y;
 
         CreateAppElement(group, currentObjData);
-        CreateAppDetails();
+        CreateAppDetails(group);
         appObjectArray.push(group);
     }
 
 
 
     return group;
-}
-
-function CreateAppElement(group, currentObjData) {
-    let rect = two.makeRectangle(0, 0, 200, 200);
-    // rect.verticies
-    two.update();
-    group._renderer.elem.addEventListener('click', (e) => {two.update(); SelectApp(group);}, false);
-    group.add(rect);
 }
 
 function GetAppGroup(currentObjData) {
@@ -195,12 +194,26 @@ function GetAppGroup(currentObjData) {
     // });
 }
 
-function CreateAppDetails(params) {
-    
+function CreateAppElement(group, currentObjData) {
+    let rect = two.makeRectangle(300, 300, 200, 200);
+    // rect.verticies
+    two.update();
+    group._renderer.elem.addEventListener('click', (e) => {two.update(); SelectApp(group);}, false);
+    group.add(rect);
 }
 
+function CreateAppDetails(group) {
+    let nameTextObject = new Two.Text(nameText, 0, -100, 'normal');
+    nameTextObject.id = "";
+    nameTextObject.size = 10;
+
+    group.add(detail);
+    // detailArray.push(nameTextObject);
+}
+
+// App Nodes will be square and when clicked on will morph into a big circle
 function SelectApp(currentAppGroup) {
-    
+    console.log("Group Selected!");
 
     function OpenApp(params) {
 

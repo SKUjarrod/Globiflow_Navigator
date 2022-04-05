@@ -2,13 +2,14 @@
 //
 // TODO LIST //
 // create view for focused elements
-// Should move/ split up this main file into a data file. So there will be a main file for hooking everything together, data for everything data and Object_Functions for everything physical Two.js elements
 // work on Actions class
 // create html banner elements
 // develop workspace scene switching
 // make temp app selection
 // figure out how apps with nested flows will look like
 // work on XML parsing
+
+// Should move/ split up this main file into a data file. So there will be a main file for hooking everything together, data for everything data and Object_Functions for everything physical Two.js elements
 
 
 
@@ -65,22 +66,11 @@ var globalObjectsArray = []; // This is the Global Master copy of every object i
 var objectAddBuffer = []; // Used as a stack strucutre because O(1). Looked into a Queue structure but they O(n)
 var appObjectArray = [];
 var stage = new Two.Group();
+stage.id = "Stage Group";
 var connections = new Two.Group();
+connections.id = "Connections Group"
 
-let max = 1;//globalObjectsArray.length;
-
-
-// currently for testing purposes
-// will make more dynamic in future
-// make x data objects
-//
-// set this up so that when a XMLfile is parsed, it will generate the positions and all data required to display the boxes with twojs
-// for (let index = 0; index < max; index++) {
-//   let xGroupOffset = 75 + 75 * index;
-//   let yGroupOffset = 75 + (75 * index % 300);
-//   var data = new DataStructure({flowName: "object: " + index, flowID: "1234567", offset:{x: xGroupOffset, y: yGroupOffset} }); // test Data structure object
-//   globalObjectsArray.push({object: undefined, data: data});
-// }
+let max = 1;//globalObjectsArray.length + 1;
 
 
 
@@ -91,16 +81,14 @@ function CreateVisualElement() {
   for (let i = 0; i < batchCount; i++) {
     let element = objectAddBuffer.pop();
     let data = element.data;
-    // let data = globalObjectsArray[i].data;
 
     let appGroup = MakeAppElement(data);
     let group = MakeElement(data);
 
     element.object = group;
     appGroup.add(group);
-
+  
     stage.add(appGroup);
-    // objectGroupsArray.push(group) // dunno what this is??
   }
 }
 
@@ -109,18 +97,3 @@ two.add(connections);
 two.add(stage);
 addZUI();
 two.update();
-
-
-
-// function ReadFile(file) {
-//   console.log("file Changed");
-  
-//   if (file) {
-//     freader.readAsText(file);
-//   }
-
-//   // close() releases file reader and all its resources.
-//   // freader.close();
-// }
-
-
