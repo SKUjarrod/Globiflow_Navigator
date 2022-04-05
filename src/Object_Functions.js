@@ -3,6 +3,7 @@
 //
 
 let currentlyOpenedGroup;
+let currentlyOpenedAppGroup;
 
 // Make a new object. This is the base call that will call further functions to construct the final object
 function MakeElement(currentObj) {
@@ -41,17 +42,17 @@ function CreateElementDetails(group, currentObj) {
 
 
     let nameTextObject = new Two.Text(nameText, 0, - 10, 'normal');
-    nameTextObject.id = "";
+    nameTextObject.id = "nameTextObject";
     nameTextObject.size = 10;
     detailArray.push(nameTextObject);
 
     let IdTextObject = new Two.Text("ID: " + IdText, 0, 0, 'normal');
-    IdTextObject.id = "";
+    IdTextObject.id = "IdTextObject";
     IdTextObject.size = 10;
     detailArray.push(IdTextObject);
 
     let testTextObject = new Two.Text("test: " + TestText, 0, 10, 'normal');
-    testTextObject.id = "";
+    testTextObject.id = "testTextObject";
     testTextObject.size = 10;
     detailArray.push(testTextObject);
 
@@ -88,6 +89,7 @@ function selectElement(selectedGroup) {
         if (currentlyOpenedGroup != selectedGroup) {
             CloseBox(currentlyOpenedGroup, foundGroup);
         }
+        // maybe put below condition in an else from above condition
         if (foundGroup.data.selected == true && operationDone != true) {
             CloseBox(selectedGroup, foundGroup);
             operationDone = true;
@@ -163,8 +165,9 @@ function deFocusElement(boxElem, data) {
 
 
 function MakeAppElement(currentObjData) {
-    let groupExist = CheckAppExists(currentObjData.appID); // this is here because want to check for apps that already exist in globalObjectsArray. If it was after it would always find the app when it doesn't exist
-    let group;// = GetAppGroup(currentObj.appID)
+    AddNewApp(currentObjData);// only adds html content right now. no vital functionality
+    let groupExist = CheckAppExists(currentObjData.appID);
+    let group;
     if (groupExist) {
         group = GetAppGroup(currentObjData).object.parent;
     } else {
@@ -175,7 +178,7 @@ function MakeAppElement(currentObjData) {
         group.position.y = currentObjData.groupPositionOffset.y;
 
         CreateAppElement(group, currentObjData);
-        CreateAppDetails(group);
+        CreateAppDetails(group, currentObjData);
         appObjectArray.push(group);
     }
 
@@ -185,29 +188,23 @@ function MakeAppElement(currentObjData) {
 }
 
 function GetAppGroup(currentObjData) {
-    return globalObjectsArray.find((element) => {return element.data.appID === currentObjData.appID});
-    // globalObjectsArray.forEach(element => {
-    //     console.log(element.data.appID === currentObjData.appID);
-    //     if (element.data.appID === currentObjData.appID) {
-    //         return element;
-    //     }
-    // });
+    return globalObjectsArray.find( ({data}) => {return data.appID === currentObjData.appID} );
 }
 
 function CreateAppElement(group, currentObjData) {
-    let rect = two.makeRectangle(300, 300, 200, 200);
+    let rect = two.makeRectangle(0, 0, 200, 200);
     // rect.verticies
     two.update();
-    group._renderer.elem.addEventListener('click', (e) => {two.update(); SelectApp(group);}, false);
+    rect._renderer.elem.addEventListener('click', (e) => {two.update(); SelectApp(group);}, false);
     group.add(rect);
 }
 
-function CreateAppDetails(group) {
-    let nameTextObject = new Two.Text(nameText, 0, -100, 'normal');
-    nameTextObject.id = "";
-    nameTextObject.size = 10;
+function CreateAppDetails(group, currentObjData) {
+    let nameTextObject = new Two.Text(currentObjData.appName, 0, -90, 'normal');
+    nameTextObject.id = "nameTextObject";
+    nameTextObject.size = 15;
 
-    group.add(detail);
+    group.add(nameTextObject);
     // detailArray.push(nameTextObject);
 }
 
@@ -215,19 +212,56 @@ function CreateAppDetails(group) {
 function SelectApp(currentAppGroup) {
     console.log("Group Selected!");
 
-    function OpenApp(params) {
+    let operationDone = false;
+    // let foundGroup = globalObjectsArray.find( ({ object }) => object === selectedGroup); // super inefficent, especially at larger search volumes    
 
+    // close Elements
+    if (currentlyOpenedAppGroup != undefined) { 
+        if (currentlyOpenedAppGroup != currentAppGroup) {
+            // CloseBox(currentlyOpenedAppGroup, foundGroup);
+            CloseApp(currentlyOpenedAppGroup);
+        } else {
+            if (operationDone != true) {
+                // CloseBox(selectedGroup, foundGroup);
+                CloseApp(currentAppGroup);
+                operationDone = true;
+            }
+        }
     }
 
-    function CloseApp(params) {
-        
+    // open Elements
+    if (currentlyOpenedAppGroup == undefined) {
+        if (operationDone != true) {
+            // OpenBox(selectedGroup, foundGroup);
+            OpenApp(currentAppGroup);
+            operationDone = true;
+        }
+    }
+
+    function OpenApp(currentAppGroup) {
+        currentAppGroup.matrix.manual = true;
+        currentAppGroup.matrix.scale(2, 2);
+        // dataGroup.data.selected = true;
+        // FocusElement(boxElem, dataGroup);
+
+        currentlyOpenedAppGroup = currentAppGroup;
+    }
+
+    function CloseApp(currentAppGroup) {
+        currentAppGroup.matrix.scale(0.5, 0.5);
+        two.update();
+        currentAppGroup.matrix.manual = false;
+        // dataGroup.data.selected = false;
+        // deFocusElement(boxElem, dataGroup);
+
+        currentlyOpenedAppGroup = undefined;
     }
 }
 
 
 
 
-
+// add a dissable zoom and pan key so you can copy values from the screen. Maybe Left control or alt key when pressed down
 // ZUI is all the zoom and pan functionality
 function addZUI() {
     var zuiStage = new Two.ZUI(stage); // forground elements

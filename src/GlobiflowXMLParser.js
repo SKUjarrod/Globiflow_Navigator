@@ -75,7 +75,12 @@ function GetNodeData(parent, elementName) {
         }
         return parent.getElementsByTagName(elementName)[0].childNodes[0].nodeValue;
     } catch (error) {
-        console.log("Error! " + elementName + " Node must be empty");
+        if (elementName == "root" || elementName == "flow" || elementName == "steps") {
+            console.log("Error! " + elementName + " Node must be empty");
+        }
+        if (parent.getElementsByTagName(elementName)[0].childNodes.length == 0) {
+            console.log("Error! the " + elementName + " Node is empty.");
+        }
         console.log(error);
         return null;
     }
@@ -84,8 +89,8 @@ function GetNodeData(parent, elementName) {
 // generate the GlobiflowDataStructure class for an object based on the parsed xml from a file
 function GenerateDataStructure(readData) {
     ////// for testing purposes, calculate the x and y offsets here but they should be in main
-    let xGroupOffset = 75 + 75 * filesParsed;
-    let yGroupOffset = 75 + (75 * filesParsed % 300);
+    let xGroupOffset = -75 + 75 * filesParsed;
+    let yGroupOffset = -75 + (75 * filesParsed % 300);
     //////////////
     var dataStructure = new DataStructure({
         flowName: readData._flowName,
@@ -141,24 +146,15 @@ function CheckAppExists(currentAppID) {
 function AddNewApp(object) {
     let appExists = CheckAppExists(object.appID);
     let selectElement = document.getElementById('appSelect');
-
-    // // equals true, return existing group. Not sure what to do here yet when app already exists
-    // if (appExists == true) {
-    // }
     
     // equals false, create new app html elements
     if (appExists == false) {
         var option = document.createElement("option");
         option.value = object.appName;
         option.text = object.appName;
-        // option.text = val.charAt(0).toUpperCase() + val.slice(1);
-        
-        selectElement.appendChild(option);
-        // let appGroup = MakeAppElement(data);
-    }
 
-    // return whether the app exists or not
-    return appExists;
+        selectElement.appendChild(option);
+    }
 }
 
 ///////////////////////////////////////////////////
