@@ -1,0 +1,61 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="src/styles.css">
+    <script src="node_modules/two.js/build/two.min.js"></script>
+    <script src="node_modules/two.js/extras/js/zui.js"></script>
+</head>
+<body>
+    <div id="topBanner">
+      <div id="topBannerOffset">
+        
+        <div id="fileUploadWrapper" class="Wrapper">
+          <label for="fileInput"></label>
+          <input type="file" id="fileInput" name="FlowInput" accept=".xml" multiple>
+        </div>
+        
+        <div id="workplaceWrapper" class="Wrapper">
+            <select id="workplaceSelect">
+              <option value="Business_development">Business Development</option>
+              <option value="Financial_Operations">Financial Operations</option>
+              <option value="Financials">Financials</option>
+              <option value="Forms">Forms </option>
+              <option value="Jobs_and_Candidates">Jobs and Candidates</option>
+              <option value="SKUcapture">SKUcapture</option>
+              <option value="SKUvantage_studio">SKUvantage Studio</option>
+              <option value="Team">Team</option>
+              <option value="Tech">Tech</option>
+            </select>
+          </div>
+
+          <div id="AppSelectWrapper">
+            <select id="appSelect">
+              <option value="default">default</option>
+            </select>
+          </div>
+
+        </div>
+
+        <div id="searchWrapper" class="Wrapper">
+          <div id="searchBar"></div>
+          <div id="searchButton"></div>
+          <div id="searchResults"></div>
+        </div>
+
+      </div>
+    </div>
+  
+    <div id="main"></div>
+    <script src="src/Action.js"></script>
+    <script src="src/FileIO.js"></script>
+    <script src="src/Search.js"></script>
+    <script src="src/GlobiflowDataStructure.js"></script>
+    <script src="src/GlobiflowXMLParser.js"></script>
+    <script src="src/Data_Functions.js"></script>
+    <script src="src/Object_Functions.js"></script>
+    <!-- <script src="src/SceneManager.js"></script> -->
+    <script src="src/Main.js"></script>
+    
+  </body>
+</html>

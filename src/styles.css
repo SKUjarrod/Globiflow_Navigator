@@ -1,0 +1,23 @@
+#topBanner {
+    background-color: aqua;
+    align-self: center;
+    width: 100%;
+    height: 10%;
+    margin-top: -15px;
+    border-radius: 10px;
+}
+
+#topBannerOffset {
+    padding: 10px;
+    padding-top: 20px;
+}
+
+#main {
+    /* margin-top: 10px; */
+    width: 100%;
+    height: 93vh;
+}
+
+.Wrapper {
+    /* width: 50px; */
+}
