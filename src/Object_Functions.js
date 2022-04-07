@@ -9,6 +9,7 @@ let currentlyOpenedAppGroup;
 function MakeElement(currentObj) {
     let group = two.makeGroup();
     group.id = "flow Group";
+    group.visible = false;
 
     group.position.x = currentObj.groupPositionOffset.x;
     group.position.y = currentObj.groupPositionOffset.y;
@@ -24,7 +25,7 @@ function MakeElement(currentObj) {
 // draw object box from object data
 function CreateElement(group, currentObj) {
     let rect = two.makeRectangle(0, 0, 50, 50);
-    rect.id = "rect";
+    rect.id = "Flow rect";
     two.update();
     group._renderer.elem.addEventListener('click', (e) => {two.update(); selectElement(group);}, false);
     group.add(rect);
@@ -82,53 +83,54 @@ function CreateElementConnectionArrow(currentObj) {
 // selects the element by scaling element group and performing other functions to make it look like its selected. All purely visual
 function selectElement(selectedGroup) {
     let operationDone = false;
-    let foundGroup = globalObjectsArray.find( ({ object }) => object === selectedGroup); // super inefficent, especially at larger search volumes    
+    // let foundGroup = globalObjectsArray.find( ({ object }) => object === selectedGroup); // super inefficent, especially at larger search volumes. change this by reading groups dataStructure property   
 
     // close Elements
     if (currentlyOpenedGroup != undefined) { 
         if (currentlyOpenedGroup != selectedGroup) {
-            CloseBox(currentlyOpenedGroup, foundGroup);
+            CloseBox(currentlyOpenedGroup, selectedGroup.dataStructure);
         }
         // maybe put below condition in an else from above condition
-        if (foundGroup.data.selected == true && operationDone != true) {
-            CloseBox(selectedGroup, foundGroup);
+        if (selectedGroup.dataStructure.selected == true && operationDone != true) {
+            CloseBox(selectedGroup, selectedGroup.dataStructure);
             operationDone = true;
         }
     }
 
     // open Elements
     if (currentlyOpenedGroup == undefined) {
-        if (foundGroup.data.selected != true && operationDone != true) {
-            OpenBox(selectedGroup, foundGroup);
+        if (selectedGroup.dataStructure.selected != true && operationDone != true) {
+            OpenBox(selectedGroup, selectedGroup.dataStructure);
             operationDone = true;
         }
     }
 
     // opens boxes. params: selectedGroup, foundGroup
-    function OpenBox(boxElem, dataGroup) {
+    function OpenBox(boxElem) {
         boxElem.children[0].matrix.manual = true;
         boxElem.children[0].matrix.scale(2, 4);
-        dataGroup.data.selected = true;
-        FocusElement(boxElem, dataGroup);
-
-        currentlyOpenedGroup = boxElem;
-    }
+        boxElem.dataStructure.selected = true;
+        FocusElement(boxElem);
     
-    // closes boxes. params: selectedGroup, foundGroup
-    function CloseBox(boxElem, dataGroup) {
-        boxElem.children[0].matrix.scale(0.5, 0.25);
-        two.update();
-        boxElem.children[0].matrix.manual = false;
-        dataGroup.data.selected = false;
-        deFocusElement(boxElem, dataGroup);
-
-        currentlyOpenedGroup = undefined;
+        currentlyOpenedGroup = boxElem;
     }
 
 }
 
+// has to be outside scope of selectElement function because closing apps uses this function
+// closes boxes. params: selectedGroup, foundGroup
+function CloseBox(boxElem) {
+    boxElem.children[0].matrix.scale(0.5, 0.25);
+    two.update();
+    boxElem.children[0].matrix.manual = false;
+    boxElem.dataStructure.selected = false;
+    deFocusElement(boxElem);
+
+    currentlyOpenedGroup = undefined;
+}
+
 // shows all extra details from flow 
-function FocusElement(boxElem, data) {
+function FocusElement(boxElem) {
     
     //adjust the 3 quick display text to focused extended view
     boxElem.children[1].position.set(0, -50);
@@ -146,7 +148,7 @@ function FocusElement(boxElem, data) {
 
 
 // hides all extra details from flow
-function deFocusElement(boxElem, data) {
+function deFocusElement(boxElem) {
     
     //adjust the 3 quick display text back to original quick display locations
     boxElem.children[1].position.set(0, -10);
@@ -162,8 +164,9 @@ function deFocusElement(boxElem, data) {
     two.update();
 }
 
+/////////////// App element stuff ///////////
 
-
+// Make a new app object. This is the base call that will call further functions to construct the final app object
 function MakeAppElement(currentObjData) {
     AddNewApp(currentObjData);// only adds html content right now. no vital functionality
     let groupExist = CheckAppExists(currentObjData.appID);
@@ -193,6 +196,7 @@ function GetAppGroup(currentObjData) {
 
 function CreateAppElement(group, currentObjData) {
     let rect = two.makeRectangle(0, 0, 200, 200);
+    rect.id = "App rect";
     // rect.verticies
     two.update();
     rect._renderer.elem.addEventListener('click', (e) => {two.update(); SelectApp(group);}, false);
@@ -210,7 +214,7 @@ function CreateAppDetails(group, currentObjData) {
 
 // App Nodes will be square and when clicked on will morph into a big circle
 function SelectApp(currentAppGroup) {
-    console.log("Group Selected!");
+    // console.log("Group Selected!");
 
     let operationDone = false;
     // let foundGroup = globalObjectsArray.find( ({ object }) => object === selectedGroup); // super inefficent, especially at larger search volumes    
@@ -241,8 +245,7 @@ function SelectApp(currentAppGroup) {
     function OpenApp(currentAppGroup) {
         currentAppGroup.matrix.manual = true;
         currentAppGroup.matrix.scale(2, 2);
-        // dataGroup.data.selected = true;
-        // FocusElement(boxElem, dataGroup);
+        FocusApp(currentAppGroup);
 
         currentlyOpenedAppGroup = currentAppGroup;
     }
@@ -251,11 +254,35 @@ function SelectApp(currentAppGroup) {
         currentAppGroup.matrix.scale(0.5, 0.5);
         two.update();
         currentAppGroup.matrix.manual = false;
-        // dataGroup.data.selected = false;
-        // deFocusElement(boxElem, dataGroup);
+        deFocusApp(currentAppGroup);
 
         currentlyOpenedAppGroup = undefined;
     }
+}
+
+// shows all extra details from app 
+function FocusApp(appElem) {
+    for (let i = 0; i < appElem.children.length; i++) {
+        const element = appElem.children[i];
+        if (element.id == "flow Group") {
+            element.visible = true;
+        }
+    }
+    two.update();
+}
+
+// hides all extra details from app
+function deFocusApp(appElem) {
+    for (let i = 0; i < appElem.children.length; i++) {
+        const element = appElem.children[i];
+        if (element.id == "flow Group") {
+            if (element.dataStructure.selected) {
+                CloseBox(element, element.dataStructure);
+            }
+            element.visible = false;
+        }
+    }
+    two.update();
 }
 
 

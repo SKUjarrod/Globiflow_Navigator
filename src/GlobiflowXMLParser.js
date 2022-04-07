@@ -22,7 +22,7 @@ function startXMLParse(fileName, XMLResult) {
             GenerateDataStructure(data);
             // }
             
-        CreateVisualElement();
+        CreateVisualElement(); // maybe move this to FileIO.js in the multi file reader function so it only runs once when all files have been read. Currently its not batching and running every file which isnt really batching
         filesParsed++;
     }
 }
@@ -106,6 +106,8 @@ function GenerateDataStructure(readData) {
     // AddNewApp(object); // this is here because want to check for apps that already exist in globalObjectsArray. If it was after it would always find the app when it doesn't exist
     globalObjectsArray.push(object);
     objectAddBuffer.push(object);
+    // objectAddBuffer.push(dataStructure);
+
 
     // Once flowDataStructure has been added to global arrays, create its app
 }
