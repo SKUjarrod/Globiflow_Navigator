@@ -8,7 +8,7 @@ function MultiFileReader(files) {
       freader.onload = function(e) {  
         // get file content  
         var content = e.target.result;
-        startXMLParse(file.name, content)
+        startXMLParse(file.name, content);
         two.update();
   
         // recurse next file in files array

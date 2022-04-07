@@ -18,6 +18,18 @@
     height: 93vh;
 }
 
+#topBannerOffset {
+    display: flex;
+    justify-content: space-around;
+    /* flex-flow:  row wrap; */
+}
+
 .Wrapper {
-    /* width: 50px; */
+    display: flex;
+    flex-direction: column;
+    align-self: center;
+}
+
+#workplaceWrapper {
+    align-items: center;
 }
