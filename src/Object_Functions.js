@@ -8,11 +8,11 @@ let currentlyOpenedAppGroup;
 // Make a new object. This is the base call that will call further functions to construct the final object
 function MakeElement(currentObj) {
     let group = two.makeGroup();
-    group.id = "flow Group";
+    group.id = "Flow Group";
     group.visible = false;
 
-    group.position.x = currentObj.groupPositionOffset.x;
-    group.position.y = currentObj.groupPositionOffset.y;
+    // group.position.x = currentObj.groupPositionOffset.x;
+    // group.position.y = currentObj.groupPositionOffset.y;
 
     CreateElement(group, currentObj);
     CreateElementDetails(group, currentObj);
@@ -78,7 +78,6 @@ function CreateElementConnectionArrow(currentObj) {
         connections.add(lineObj);
     }
 }
-
 
 // selects the element by scaling element group and performing other functions to make it look like its selected. All purely visual
 function selectElement(selectedGroup) {
@@ -168,17 +167,17 @@ function deFocusElement(boxElem) {
 
 // Make a new app object. This is the base call that will call further functions to construct the final app object
 function MakeAppElement(currentObjData) {
-    AddNewApp(currentObjData);// only adds html content right now. no vital functionality
+    // AddNewApp(currentObjData);// only adds html content right now. no vital functionality
     let groupExist = CheckAppExists(currentObjData.appID);
     let group;
     if (groupExist) {
-        group = GetAppGroup(currentObjData).object.parent;
+        group = GetAppGroupInGlobalObjects(currentObjData);
     } else {
         group = two.makeGroup();
         group.id = "App Group";
 
-        group.position.x = currentObjData.groupPositionOffset.x;
-        group.position.y = currentObjData.groupPositionOffset.y;
+        SetAppOffsets(group, currentObjData.groupPositionOffset.x, currentObjData.groupPositionOffset.y)
+
 
         CreateAppElement(group, currentObjData);
         CreateAppDetails(group, currentObjData);
@@ -190,9 +189,21 @@ function MakeAppElement(currentObjData) {
     return group;
 }
 
-function GetAppGroup(currentObjData) {
-    return globalObjectsArray.find( ({data}) => {return data.appID === currentObjData.appID} );
+// function GetAppGroupInGlobalObjects(currentObjData) {
+//     return globalObjectsArray.find( (app) => {app.data.appID === currentObjData.appID} );
+// }
+
+function GetAppGroupInGlobalObjects(currentObjData) {
+    for (let i = 0; i < globalObjectsArray.length; i++) {
+        const currentApp = globalObjectsArray[i].object;
+        if (currentApp != undefined) {
+            if (currentApp.dataStructure.appID == currentObjData.appID) {
+                return currentApp.parent;
+            }
+        }
+    }
 }
+
 
 function CreateAppElement(group, currentObjData) {
     let rect = two.makeRectangle(0, 0, 200, 200);
@@ -264,7 +275,7 @@ function SelectApp(currentAppGroup) {
 function FocusApp(appElem) {
     for (let i = 0; i < appElem.children.length; i++) {
         const element = appElem.children[i];
-        if (element.id == "flow Group") {
+        if (element.id == "Flow Group") {
             element.visible = true;
         }
     }
@@ -275,7 +286,7 @@ function FocusApp(appElem) {
 function deFocusApp(appElem) {
     for (let i = 0; i < appElem.children.length; i++) {
         const element = appElem.children[i];
-        if (element.id == "flow Group") {
+        if (element.id == "Flow Group") {
             if (element.dataStructure.selected) {
                 CloseBox(element, element.dataStructure);
             }

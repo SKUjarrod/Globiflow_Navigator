@@ -26,7 +26,7 @@
             <option value="SKUcapture">SKUcapture</option>
             <option value="SKUvantage_studio">SKUvantage Studio</option>
             <option value="Team">Team</option>
-            <option value="Tech">Tech</option>
+            <option value="Tech" selected>Tech</option>
           </select>
         </div>
 
@@ -37,9 +37,17 @@
         </div>
 
         <div id="searchWrapper" class="Wrapper">
-          <div id="searchBar"></div>
-          <div id="searchButton"></div>
-          <div id="searchResults"></div>
+          <div id="searchBar">
+            <label for="searchBar">Search</label>
+            <input type="text" id="searchBar"></input>
+          </div>
+
+          <div id="searchButton">
+            <button>Search</button>
+          </div>
+
+          <div id="searchResults">
+          </div>
         </div>
 
       </div>
@@ -47,13 +55,14 @@
   
     <div id="main"></div>
     <script src="src/Action.js"></script>
+    <script src="src/ElementSizes.js"></script>
     <script src="src/FileIO.js"></script>
     <script src="src/Search.js"></script>
     <script src="src/GlobiflowDataStructure.js"></script>
     <script src="src/GlobiflowXMLParser.js"></script>
     <script src="src/Data_Functions.js"></script>
     <script src="src/Object_Functions.js"></script>
-    <!-- <script src="src/SceneManager.js"></script> -->
+    <script src="src/SceneManager.js"></script>
     <script src="src/Main.js"></script>
     
   </body>

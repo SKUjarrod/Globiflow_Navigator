@@ -22,7 +22,7 @@ function startXMLParse(fileName, XMLResult) {
             GenerateDataStructure(data);
             // }
             
-        CreateVisualElement(); // maybe move this to FileIO.js in the multi file reader function so it only runs once when all files have been read. Currently its not batching and running every file which isnt really batching
+        // CreateVisualElement(); // maybe move this to FileIO.js in the multi file reader function so it only runs once when all files have been read. Currently its not batching and running every file which isnt really batching
         filesParsed++;
     }
 }
@@ -89,9 +89,14 @@ function GetNodeData(parent, elementName) {
 // generate the GlobiflowDataStructure class for an object based on the parsed xml from a file
 function GenerateDataStructure(readData) {
     ////// for testing purposes, calculate the x and y offsets here but they should be in main
-    let xGroupOffset = -75 + 75 * filesParsed;
-    let yGroupOffset = -75 + (75 * filesParsed % 300);
+    let appOffset = CalculateAppOffsets(readData);
+    let xGroupOffset = appOffset.x;
+    let yGroupOffset = appOffset.y;
+
+    // let xGroupOffset = 300 + 75 * filesParsed;
+    // let yGroupOffset = 300 + (75 * filesParsed % 300);
     //////////////
+
     var dataStructure = new DataStructure({
         flowName: readData._flowName,
         // flowID: readData._flowID,
@@ -136,9 +141,11 @@ function Base64Decode(base64Encoded) {
 // Checks if a workspace has been created already
 function CheckAppExists(currentAppID) {
     for (let i = 0; i < globalObjectsArray.length; i++) {
-        const currentElementData = globalObjectsArray[i].data;
-        if ((currentElementData.appID == currentAppID) && (globalObjectsArray[i].object != undefined)) {
-            return true;
+        const currentElementData = globalObjectsArray[i].object;
+        if (currentElementData != undefined) {
+            if (currentElementData.dataStructure.appID == currentAppID) {
+                return true;
+            }
         }
     }
     return false;

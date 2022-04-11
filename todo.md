@@ -4,16 +4,17 @@
 
 * TODO LIST 
 
- restructure data and object matching with GlobalObjectArray, etc.
- work on better batching visualTwojs Element creation
- fix when app is open and flow group is open and then app closes, flow doesn't close
- create view for focused elements
- work on Actions class
- create html banner elements
- develop workspace scene switching
- make temp app selection
- figure out how apps with nested flows will look like
- work on XML parsing
- work on state serialisation
+Fix issue in SceneManager.js CalculateFlowInAppOffset. appsToBeCalculated adding too many apps. logic is incorrect as multiple flows should be added and then function figures out what apps need to be updated once and does them
 
- Should move/ split up this main file into a data file. So there will be a main file for hooking everything together, data for everything data and Object_Functions for everything physical Two.js elements
+restructure data and object matching with GlobalObjectArray, etc.
+work on better batching visualTwojs Element creation
+create view for focused elements
+work on Actions class
+create html banner elements
+develop workspace scene switching
+make temp app selection
+figure out how apps with nested flows will look like
+work on XML parsing
+work on state serialisation
+
+Should move/ split up this main file into a data file. So there will be a main file for hooking everything together, data for everything data and Object_Functions for everything physical Two.js elements

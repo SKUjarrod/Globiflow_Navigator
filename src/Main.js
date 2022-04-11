@@ -7,10 +7,10 @@
 var domElement = document.getElementById("main");
 
 var two = new Two({
-  // fullscreen: true,
-  fitted: true,
-  autostart: true,
-  type: Two.Types.svg,
+    // fullscreen: true,
+    fitted: true,
+    autostart: true,
+    type: Two.Types.svg,
 }).appendTo(domElement);
 
 ////////////////////////////////
@@ -26,10 +26,10 @@ ReadAppState();
 
 var fileInputElement = document.getElementById("fileInput");
 fileInputElement.addEventListener("change", () => {
-MultiFileReader(fileInputElement.files);
+    MultiFileReader(fileInputElement.files);
 
-// write the current app state to the saves file in the saves folder. Used so dont have to import everything every time you open the app
-WriteAppState();
+    // write the current app state to the saves file in the saves folder. Used so dont have to import everything every time you open the app
+    WriteAppState();
 }, false);
 
 
@@ -39,7 +39,7 @@ WriteAppState();
 
 
 document.getElementById('workplaceSelect').addEventListener("change", (e) => {
-  alert('selected "' + e.currentTarget.value + '" Workspace');
+    alert('selected "' + e.currentTarget.value + '" Workspace');
 });
 
 
@@ -58,7 +58,7 @@ stage.id = "Stage Group";
 var connections = new Two.Group();
 connections.id = "Connections Group";
 
-let max = 1;//globalObjectsArray.length + 1;
+let max = 1;//globalObjectsArray.length + 1; //currently used for creating connection lines
 
 
 // add data object as attribute to flow group object.
@@ -66,20 +66,23 @@ let max = 1;//globalObjectsArray.length + 1;
 // Create some buffer for this. When buffer updates, run this code to make new box and then remove it from buffer
 function CreateVisualElement() {
 // Creates the visual elements with twojs
-  let batchCount = objectAddBuffer.length
-  for (let i = 0; i < batchCount; i++) {
-    let element = objectAddBuffer.pop();
-    let data = element.data;
+    let batchCount = objectAddBuffer.length
+    let appGroup;
+    for (let i = 0; i < batchCount; i++) {
+        let element = objectAddBuffer.pop();
+        let data = element.data;
 
-    let appGroup = MakeAppElement(data);
-    let group = MakeElement(data);
+        appGroup = MakeAppElement(data);
 
-    element.object = group;
-    group.dataStructure = data;
-    
-    appGroup.add(group);
-    stage.add(appGroup);
-  }
+        let group = MakeElement(data);
+
+        element.object = group;
+        group.dataStructure = data;
+        appGroup.add(group);
+        stage.add(appGroup);
+        AddAppGroupToBeCalculated(appGroup);
+    }
+    CalculateFlowInAppOffset(appGroup);
 }
 
 
