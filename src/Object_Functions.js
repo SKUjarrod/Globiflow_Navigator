@@ -24,7 +24,7 @@ function MakeElement(currentObj) {
 
 // draw object box from object data
 function CreateElement(group, currentObj) {
-    let rect = two.makeRectangle(0, 0, 50, 50);
+    let rect = two.makeRectangle(0, 0, flowSize, flowSize);
     rect.id = "Flow rect";
     two.update();
     group._renderer.elem.addEventListener('click', (e) => {two.update(); selectElement(group);}, false);
@@ -206,7 +206,7 @@ function GetAppGroupInGlobalObjects(currentObjData) {
 
 
 function CreateAppElement(group, currentObjData) {
-    let rect = two.makeRectangle(0, 0, 200, 200);
+    let rect = two.makeRectangle(0, 0, appSize, appSize);
     rect.id = "App rect";
     // rect.verticies
     two.update();
@@ -215,7 +215,7 @@ function CreateAppElement(group, currentObjData) {
 }
 
 function CreateAppDetails(group, currentObjData) {
-    let nameTextObject = new Two.Text(currentObjData.appName, 0, -90, 'normal');
+    let nameTextObject = new Two.Text(currentObjData.appName, 0, (-(appSize/2)+17), 'normal');
     nameTextObject.id = "nameTextObject";
     nameTextObject.size = 15;
 

@@ -76,12 +76,12 @@ function GetNodeData(parent, elementName) {
         return parent.getElementsByTagName(elementName)[0].childNodes[0].nodeValue;
     } catch (error) {
         if (elementName == "root" || elementName == "flow" || elementName == "steps") {
-            console.log("Error! " + elementName + " Node must be empty");
+            console.warn("Error! " + elementName + " Node must be empty");
         }
         if (parent.getElementsByTagName(elementName)[0].childNodes.length == 0) {
-            console.log("Error! the " + elementName + " Node is empty.");
+            console.warn("Error! the " + elementName + " Node is empty.");
         }
-        console.log(error);
+        console.warn(error);
         return null;
     }
 }

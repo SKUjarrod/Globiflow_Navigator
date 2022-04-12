@@ -1,5 +1,8 @@
-// const flowSize = [50, 50];
-// const appSize = [300, 300];
+// flow sizes
+
 const flowSize = 50;
+
+// app sizes
 const appSize = 300;
+const appInnerPadding = 5;
 

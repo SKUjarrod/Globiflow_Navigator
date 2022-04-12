@@ -11,7 +11,7 @@ function CalculateAppOffsets(AppGroup) {
     
     // calculate offsets from centre point here
     // DisparseAlgorithm(1);
-    return {x: 0, y: 0};
+    return {x: Math.random()*1000, y: Math.random()*1000};
 }
 
 
@@ -43,15 +43,13 @@ let appsToBeCalculated = [];
 function CalculateFlowInAppOffset() {
     // need to change how appsToBeCalculated is added to array. 
     for (let app = 0; app < appsToBeCalculated.length; app++) {
-        let flows = GetFlowGroupsInAppObject(appsToBeCalculated[app]);        
+        let flows = GetFlowGroupsInAppObject(appsToBeCalculated[app]);
+
+        let spaceBetween = (appSize-(flowSize*flows.length))/flows.length;// - (appInnerPadding * 2);
         
-        let flowSize = 50;//ElementSizes.flowSize;
-        let appSize = 300;//ElementSizes.appSize;
-        // let spaceBetween = appSize.height-(flowSize.height*appGroupChildren.length);
-        
-        for (let flow = 0; flow < flows.length; flow++) {  
-            let X = 0 + (75 * flow);
-            let Y = 0 + (75 * flow);
+        for (let flow = 0; flow <= flows.length; flow++) {  
+            let X = (-appSize/2 + flowSize/2 + (spaceBetween/2 * flow)) ; // -125 is exacly on the left inner wall
+            let Y = 20 * flow;// + (flowSize/2 - (appSize/2 - flowSize)) + ((flowSize * 0)% 150); // 20px is the top text for a app
             
             
 
@@ -63,8 +61,11 @@ function CalculateFlowInAppOffset() {
     appsToBeCalculated = [];
 }
 
-function AddAppGroupToBeCalculated(appGroup) {
-    appsToBeCalculated.push(appGroup);
+// adds a flows parent (App Group) to the array of apps that need to be recalculated
+function AddFlowGroupToBeCalculated(flowGroup) {
+    if (!appsToBeCalculated.includes(flowGroup.parent)) {
+        appsToBeCalculated.push(flowGroup.parent);
+    }
 }
 
 function SetFlowOffsets(flowGroup, X, Y) {

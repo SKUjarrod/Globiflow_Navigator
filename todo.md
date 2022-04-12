@@ -4,7 +4,8 @@
 
 * TODO LIST 
 
-Fix issue in SceneManager.js CalculateFlowInAppOffset. appsToBeCalculated adding too many apps. logic is incorrect as multiple flows should be added and then function figures out what apps need to be updated once and does them
+work on app position offsets
+work on flow inside app position offsets
 
 restructure data and object matching with GlobalObjectArray, etc.
 work on better batching visualTwojs Element creation

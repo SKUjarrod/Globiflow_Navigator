@@ -80,7 +80,7 @@ function CreateVisualElement() {
         group.dataStructure = data;
         appGroup.add(group);
         stage.add(appGroup);
-        AddAppGroupToBeCalculated(appGroup);
+        AddFlowGroupToBeCalculated(group);
     }
     CalculateFlowInAppOffset(appGroup);
 }
