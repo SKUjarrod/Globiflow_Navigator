@@ -1,14 +1,14 @@
 * LINKS OF INTEREST
 
  https://codepen.io/jonobr1/pen/wvqRLbR?editors=0010 morphing verticies for appObject opening and closing
+ https://workflow-automation.podio.com/help/using-actions.php All Actions in globiflow
 
 * TODO LIST 
 
 work on app position offsets
 work on flow inside app position offsets
 
-restructure data and object matching with GlobalObjectArray, etc.
-work on better batching visualTwojs Element creation
+
 create view for focused elements
 work on Actions class
 create html banner elements

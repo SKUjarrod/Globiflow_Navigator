@@ -36,5 +36,6 @@ class DataStructure {
         // this.position = {x: params.pos.x, y: params.pos.y};
         this.groupPositionOffset = {x: params.offset.x, y: params.offset.y};
         this.workspace = params.workspace;
+        this.flowActions = params.flowActions
     }
 }

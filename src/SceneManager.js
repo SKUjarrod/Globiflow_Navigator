@@ -45,12 +45,21 @@ function CalculateFlowInAppOffset() {
     for (let app = 0; app < appsToBeCalculated.length; app++) {
         let flows = GetFlowGroupsInAppObject(appsToBeCalculated[app]);
 
-        let spaceBetween = (appSize-(flowSize*flows.length))/flows.length;// - (appInnerPadding * 2);
-        
-        for (let flow = 0; flow <= flows.length; flow++) {  
-            let X = (-appSize/2 + flowSize/2 + (spaceBetween/2 * flow)) ; // -125 is exacly on the left inner wall
-            let Y = 20 * flow;// + (flowSize/2 - (appSize/2 - flowSize)) + ((flowSize * 0)% 150); // 20px is the top text for a app
+        let spaceBetween = ((appSize-(flowSize*flows.length))/flows.length)/2;// Space evently on each side of flow element - (appInnerPadding * 2);
+        // let distance appart = 0
+
+        let lastX = 0;
+        let lasty = 0;
+        // -appSize/2 + flowSize/2 + spaceBetween;
+        for (let flow = 0; flow < flows.length; flow++) {  
+            // let X = lastX + (-appSize/2 + flowSize/2 + spaceBetween) + ((spaceBetween*2 + flowSize)*flow); // -125 is exacly on the left inner wall
+            // lastX = X;
+            // let Y = 20;// * flow;// + (flowSize/2 - (appSize/2 - flowSize)) + ((flowSize * 0)% 150); // 20px is the top text for a app
+            // lastY = Y;
             
+            // this is so close
+            let X = (-appSize/2 + flowSize + spaceBetween/2 + (spaceBetween * flow + flowSize * flow)); // -125 is exacly on the left inner wall
+            let Y = 20;//(-appSize/2 + flowSize + spaceBetween/2 + (spaceBetween * flow + flowSize * flow));// + (flowSize/2 - (appSize/2 - flowSize)) + ((flowSize * 0)% 150); // 20px is the top text for a app
             
 
 

@@ -36,9 +36,8 @@ function ExtractDatafromXMLDOM(XMLDOM) {
         _appID: '',
         _appName: '',
         _workSpace: '',
+        _actions: '',
     };
-    
-
 
     let root = GetNodeData(XMLDOM, "root");
     let flow = GetNodeData(root, "flow");
@@ -49,8 +48,8 @@ function ExtractDatafromXMLDOM(XMLDOM) {
     data._appID = GetNodeData(flow, "podioAppId");
     data._appName = GetNodeData(flow, "appName");
     data._workSpace = workspaces.Tech;
+    data.actions = steps;
     
-    // xmlDoc.getElementsByTagName("title")[0].childNodes[0].nodeValue;
     return data;
 }
 
@@ -68,6 +67,7 @@ function CheckFileCompatability(fileName, doc) {
     }    
 }
 
+// gets a node from xml
 function GetNodeData(parent, elementName) {
     try {
         if (elementName == "root" || elementName == "flow" || elementName == "steps") {
@@ -131,9 +131,22 @@ function CalculateConnections(Flow) {
 
 // decode a base64 encoded string
 function Base64Decode(base64Encoded) {
-    let result;
+    let result = atob(base64Encoded);
 
     return result;
+}
+
+function ParseActions(ActionsXML) {
+    let actions = []; 
+    // loop over every step.
+    // used base64Decode to decode the step details
+    // return each step in actions array
+    // create new Action classes for every action here and put in actions array
+    // this function should be called from GenerateDataStructure so the actions are in an array
+
+
+
+    return actions;
 }
 
 ///// this is all data oriented app stuff //////// dont know if all this is entirely nessessary. Maybe just the checkAppExists function should exist and modified to be less expensive, maybe search appArray instead of every objectArray
