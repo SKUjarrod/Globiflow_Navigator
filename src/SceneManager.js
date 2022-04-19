@@ -37,6 +37,24 @@ function SetAppOffsets(appGroup, X, Y) {
 // Flow stuff
 
 
+/////////////|/////////////
+//                      //
+//   |-----|  |-----|   //
+//   |  +  |  |  +  |   //
+//   |-----|  |-----|   //
+//                      //
+/////////////|/////////////
+
+
+/////////////|/////////////
+//                       //
+//|-----|                //
+//|  +  |///////||/////////
+//|-----|                //
+//                       //
+/////////////|/////////////
+
+
 let appsToBeCalculated = [];
 
 // flows get added to a buffer. At end of batch visual creation in main.js flow offsets are calculated. If at least one flow in an app group need calculating everything flow offset in app is to be recalculated
@@ -45,25 +63,20 @@ function CalculateFlowInAppOffset() {
     for (let app = 0; app < appsToBeCalculated.length; app++) {
         let flows = GetFlowGroupsInAppObject(appsToBeCalculated[app]);
 
-        let spaceBetween = ((appSize-(flowSize*flows.length))/flows.length)/2;// Space evently on each side of flow element - (appInnerPadding * 2);
-        // let distance appart = 0
+        let spaceBetween = ((appSize-(flowSize*flows.length))/flows.length) / 2;// Space evently on each side of flow element - (appInnerPadding * 2);
+        console.log(spaceBetween);
 
-        let lastX = 0;
-        let lasty = 0;
-        // -appSize/2 + flowSize/2 + spaceBetween;
-        for (let flow = 0; flow < flows.length; flow++) {  
-            // let X = lastX + (-appSize/2 + flowSize/2 + spaceBetween) + ((spaceBetween*2 + flowSize)*flow); // -125 is exacly on the left inner wall
-            // lastX = X;
-            // let Y = 20;// * flow;// + (flowSize/2 - (appSize/2 - flowSize)) + ((flowSize * 0)% 150); // 20px is the top text for a app
-            // lastY = Y;
+        for (let flow = 1; flow <= flows.length; flow++) {  
+            let X = (-appSize/2) + ( (spaceBetween * flow) + ((flows.length == 1 ? flowSize/2 : flowSize) * flow ) % 200);
+            let Y = (-appSize/2 + 20) + ( (spaceBetween * flow) + ((flows.length == 1 ? flowSize/2 : flowSize) * flow ) ); // 20px is the top text for a app
             
             // this is so close
-            let X = (-appSize/2 + flowSize + spaceBetween/2 + (spaceBetween * flow + flowSize * flow)); // -125 is exacly on the left inner wall
-            let Y = 20;//(-appSize/2 + flowSize + spaceBetween/2 + (spaceBetween * flow + flowSize * flow));// + (flowSize/2 - (appSize/2 - flowSize)) + ((flowSize * 0)% 150); // 20px is the top text for a app
+            // let X = (-appSize/2 + flowSize + spaceBetween/2 + (spaceBetween * flow + flowSize * flow)); // -125 is exacly on the left inner wall
+            // let Y = 20;//(-appSize/2 + flowSize + spaceBetween/2 + (spaceBetween * flow + flowSize * flow));// + (flowSize/2 - (appSize/2 - flowSize)) + ((flowSize * 0)% 150); // 20px is the top text for a app
             
 
 
-            SetFlowOffsets(flows[flow], X, Y);
+            SetFlowOffsets(flows[flow-1], X, Y);
         }
     }
         
