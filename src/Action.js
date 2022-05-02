@@ -2,7 +2,7 @@ let actionName = "";
 let stepID = 0;
 let actionType = "";
 let actionDetails = [""];
-let nextAction = Action;
+let nextAction = undefined; //type: Action
 
 class Action {
     constructor(params) {

@@ -63,13 +63,28 @@ function CalculateFlowInAppOffset() {
     for (let app = 0; app < appsToBeCalculated.length; app++) {
         let flows = GetFlowGroupsInAppObject(appsToBeCalculated[app]);
 
-        let spaceBetween = ((appSize-(flowSize*flows.length))/flows.length) / 2;// Space evently on each side of flow element - (appInnerPadding * 2);
-        console.log(spaceBetween);
+        // console.log(spaceBetween);
+        
+        let slots = [];    // [X][Y]
+        
+        let numFitX = Math.floor((appSize - appInnerPadding * 2) / flowSize);
+        numFitX > flows.length ? numFitX = flows.length : numFitX;
+        let spaceBetween = ((appSize-(flowSize*numFitX))/numFitX) / 2;// Space evently on each side of flow element - (appInnerPadding * 2);
+        let numFitY = (flows.length / numFitX >= 1) ? Math.ceil((flows.length / numFitX)) : Math.floor((flows.length / numFitX));
 
-        for (let flow = 1; flow <= flows.length; flow++) {  
-            let X = (-appSize/2) + ( (spaceBetween * flow) + ((flows.length == 1 ? flowSize/2 : flowSize) * flow ) % 200);
-            let Y = (-appSize/2 + 20) + ( (spaceBetween * flow) + ((flows.length == 1 ? flowSize/2 : flowSize) * flow ) ); // 20px is the top text for a app
+        for (let y = 1; y <= numFitY; y++) {
+            for (let x = 1; x <= numFitX; x++) {
+                slots[(y)*(x)] = { X: -(appSize/2) + appInnerPadding + (spaceBetween * x) + (flowSize*(x)), Y: -(appSize/2) + appTopOffset + (flowSize*(y)) };
+            }
+        }
+
+        for (let flow = 1; flow <= flows.length; flow++) {
+            // let X = (-appSize/2) + ( (spaceBetween * flow) + ((flows.length == 1 ? flowSize/2 : flowSize) * flow ) % ((flowSize*flow > appSize) ? 1 : appSize));
+            // let Y = 20;//(-appSize/2 + 20) + ( (spaceBetween * flow) + ((flows.length == 1 ? flowSize/2 : flowSize) * flow ) ); // 20px is the top text for a app
             
+            let X = slots[flow].X;//+ flowSize / 2;
+            let Y = slots[flow].Y;//  + flowSize / 2;
+
             // this is so close
             // let X = (-appSize/2 + flowSize + spaceBetween/2 + (spaceBetween * flow + flowSize * flow)); // -125 is exacly on the left inner wall
             // let Y = 20;//(-appSize/2 + flowSize + spaceBetween/2 + (spaceBetween * flow + flowSize * flow));// + (flowSize/2 - (appSize/2 - flowSize)) + ((flowSize * 0)% 150); // 20px is the top text for a app
