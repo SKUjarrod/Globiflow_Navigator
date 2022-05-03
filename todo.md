@@ -5,8 +5,9 @@
 
 * TODO LIST 
 
+work on Actions class and creating Actions
 create view for focused elements
-work on Actions class
+
 create html banner elements
 develop workspace scene switching
 make temp app selection

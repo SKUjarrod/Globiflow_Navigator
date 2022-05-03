@@ -1,6 +1,6 @@
 // this file needs to be able to read XML files and serialise already read xml files such that it'll be able to reopen it when the webpage is reloaded
 
-let filesParsed = 0;    // // starts on 1 because
+let filesParsed = 0;
 let parser = new DOMParser();
 let xmlDoc;
 
@@ -13,15 +13,9 @@ function startXMLParse(fileName, XMLResult) {
     if (CheckFileCompatability(fileName, xmlDoc)) {
         data = ExtractDatafromXMLDOM(xmlDoc);
         
-        
-        // for loop here to loop through multiple XML files if needed. Not sure if this is needed yet
-        // for (let index = 0; index < array.length; index++) {
-            //     const element = array[index];
-            
-            // CalculateConnections(/*param of flow to find connections to and from here*/ "test");
-            GenerateDataStructure(data);
-            // }
-            
+        // CalculateConnections(/*param of flow to find connections to and from here*/ "test");
+        GenerateDataStructure(data);
+
         // CreateVisualElement(); // maybe move this to FileIO.js in the multi file reader function so it only runs once when all files have been read. Currently its not batching and running every file which isnt really batching
         filesParsed++;
     }
@@ -48,12 +42,12 @@ function ExtractDatafromXMLDOM(XMLDOM) {
     data._appID = GetNodeData(flow, "podioAppId");
     data._appName = GetNodeData(flow, "appName");
     data._workSpace = workspaces.Tech;
-    data.actions = steps;
+    data._actions = steps;
     
     return data;
 }
 
-
+// checks if the file is compatible. Checks for certain nodes existing in XML doc
 function CheckFileCompatability(fileName, doc) {
     try {
         if (GetNodeData(doc, "root")) {
@@ -88,19 +82,15 @@ function GetNodeData(parent, elementName) {
 
 // generate the GlobiflowDataStructure class for an object based on the parsed xml from a file
 function GenerateDataStructure(readData) {
-    ////// for testing purposes, calculate the x and y offsets here but they should be in main
-    let appOffset = CalculateAppOffsets(readData);
-    let xGroupOffset = appOffset.x;
-    let yGroupOffset = appOffset.y;
 
-    // let xGroupOffset = 300 + 75 * filesParsed;
-    // let yGroupOffset = 300 + (75 * filesParsed % 300);
-    //////////////
+    let actions = ParseActions(readData);
+
+    let appOffset = CalculateAppOffsets(readData);
 
     var dataStructure = new DataStructure({
         flowName: readData._flowName,
         // flowID: readData._flowID,
-        offset:{x: xGroupOffset, y: yGroupOffset},
+        offset:{x: appOffset.x, y: appOffset.y},
         description: readData._description,
         appID: readData._appID,
         appName: readData._appName,
@@ -108,11 +98,8 @@ function GenerateDataStructure(readData) {
     });
 
     let object = {object: undefined, data: dataStructure};
-    // AddNewApp(object); // this is here because want to check for apps that already exist in globalObjectsArray. If it was after it would always find the app when it doesn't exist
     globalObjectsArray.push(object);
     objectAddBuffer.push(object);
-    // objectAddBuffer.push(dataStructure);
-
 
     // Once flowDataStructure has been added to global arrays, create its app
 }
@@ -137,17 +124,51 @@ function Base64Decode(base64Encoded) {
 }
 
 function ParseActions(ActionsXML) {
-    let actions = []; 
+    let actions = [];
+
     // loop over every step.
     // used base64Decode to decode the step details
     // return each step in actions array
     // create new Action classes for every action here and put in actions array
     // this function should be called from GenerateDataStructure so the actions are in an array
 
+    for (let i = 0; i < ActionsXML._actions.childNodes.length; i++) {
+        const step = ActionsXML._actions.childNodes[i];
+        // const stepData = 
+        let stepType = GetNodeData(step, "stepType");
+        let stepFunction = GetNodeData(step, "stepFunction");
+        let stepDetails = Base64Decode( GetNodeData(step, "stepDetails") );
+        switch (stepFunction) {
+            case "fieldChanged":
+                new Action({
+                    actionName: "",
+                    stepID: i,
+                    actionType: "",
+                    actionDetails: "",
+                    nextAction: ""
+                })
+                break;
+        
+            default:
+                console.error("Error! Parsing Actions Failed on Function switcher!");
+                break;
+        }
+    }
 
 
     return actions;
 }
+
+// this function parses Action details into something readable
+// takes in decoded base64 and returns array of details about step (Maybe, not sure of return format yet)
+function ParseActionDetails(stepDetails) {
+    let result = "";
+
+    return result;
+}
+
+
+
 
 ///// this is all data oriented app stuff //////// dont know if all this is entirely nessessary. Maybe just the checkAppExists function should exist and modified to be less expensive, maybe search appArray instead of every objectArray
 
