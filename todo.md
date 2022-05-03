@@ -5,10 +5,6 @@
 
 * TODO LIST 
 
-work on app position offsets
-work on flow inside app position offsets
-
-
 create view for focused elements
 work on Actions class
 create html banner elements
@@ -17,5 +13,9 @@ make temp app selection
 figure out how apps with nested flows will look like
 work on XML parsing
 work on state serialisation
+
+work on app position offsets
+work on odd number flow positioning
+
 
 Should move/ split up this main file into a data file. So there will be a main file for hooking everything together, data for everything data and Object_Functions for everything physical Two.js elements

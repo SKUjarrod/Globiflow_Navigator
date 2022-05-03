@@ -59,39 +59,29 @@ let appsToBeCalculated = [];
 
 // flows get added to a buffer. At end of batch visual creation in main.js flow offsets are calculated. If at least one flow in an app group need calculating everything flow offset in app is to be recalculated
 function CalculateFlowInAppOffset() {
-    // need to change how appsToBeCalculated is added to array. 
     for (let app = 0; app < appsToBeCalculated.length; app++) {
+        // need to change how appsToBeCalculated is added to array. // this may have already been done. Not sure??
         let flows = GetFlowGroupsInAppObject(appsToBeCalculated[app]);
-
-        // console.log(spaceBetween);
         
         let slots = [];    // [X][Y]
         
         let numFitX = Math.floor((appSize - appInnerPadding * 2) / flowSize);
         numFitX > flows.length ? numFitX = flows.length : numFitX;
-        let spaceBetween = ((appSize-(flowSize*numFitX))/numFitX) / 2;// Space evently on each side of flow element - (appInnerPadding * 2);
+        let spaceBetween = ((appSize-(flowSize*numFitX))/numFitX) / 2 + appInnerPadding;
         let numFitY = (flows.length / numFitX >= 1) ? Math.ceil((flows.length / numFitX)) : Math.floor((flows.length / numFitX));
 
+        let count = 0;
         for (let y = 1; y <= numFitY; y++) {
             for (let x = 1; x <= numFitX; x++) {
-                slots[(y)*(x)] = { X: -(appSize/2) + appInnerPadding + (spaceBetween * x) + (flowSize*(x)), Y: -(appSize/2) + appTopOffset + (flowSize*(y)) };
+                slots[count] = { X: -(appSize/2) + appInnerPadding + (spaceBetween * x) + (flowSize*(x)), Y: -(appSize/2) + appTopOffset + (flowSize*(y)) };
+                count++;
             }
         }
 
-        for (let flow = 1; flow <= flows.length; flow++) {
-            // let X = (-appSize/2) + ( (spaceBetween * flow) + ((flows.length == 1 ? flowSize/2 : flowSize) * flow ) % ((flowSize*flow > appSize) ? 1 : appSize));
-            // let Y = 20;//(-appSize/2 + 20) + ( (spaceBetween * flow) + ((flows.length == 1 ? flowSize/2 : flowSize) * flow ) ); // 20px is the top text for a app
-            
-            let X = slots[flow].X;//+ flowSize / 2;
-            let Y = slots[flow].Y;//  + flowSize / 2;
-
-            // this is so close
-            // let X = (-appSize/2 + flowSize + spaceBetween/2 + (spaceBetween * flow + flowSize * flow)); // -125 is exacly on the left inner wall
-            // let Y = 20;//(-appSize/2 + flowSize + spaceBetween/2 + (spaceBetween * flow + flowSize * flow));// + (flowSize/2 - (appSize/2 - flowSize)) + ((flowSize * 0)% 150); // 20px is the top text for a app
-            
-
-
-            SetFlowOffsets(flows[flow-1], X, Y);
+        for (let flow = 0; flow < flows.length; flow++) {
+            let X = slots[flow].X - flowSize / 2;
+            let Y = slots[flow].Y - flowSize / 2;
+            SetFlowOffsets(flows[flow], X, Y);
         }
     }
         
