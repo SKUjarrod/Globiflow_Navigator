@@ -5,6 +5,8 @@
 
 * TODO LIST 
 
+globiflowXMLParser line 187 fix regex so that it only selects whole words without the "", tokenising the stepDetails string
+
 work on Actions class and creating Actions
 create view for focused elements
 

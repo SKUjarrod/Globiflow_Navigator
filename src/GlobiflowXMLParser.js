@@ -95,6 +95,7 @@ function GenerateDataStructure(readData) {
         appID: readData._appID,
         appName: readData._appName,
         workspace: readData._workSpace,
+        flowActions: actions
     });
 
     let object = {object: undefined, data: dataStructure};
@@ -132,20 +133,33 @@ function ParseActions(ActionsXML) {
     // create new Action classes for every action here and put in actions array
     // this function should be called from GenerateDataStructure so the actions are in an array
 
+    let prevAction;
     for (let i = 0; i < ActionsXML._actions.childNodes.length; i++) {
+        let action;
+
         const step = ActionsXML._actions.childNodes[i];
         // const stepData = 
         let stepType = GetNodeData(step, "stepType");
         let stepFunction = GetNodeData(step, "stepFunction");
-        let stepDetails = Base64Decode( GetNodeData(step, "stepDetails") );
-        switch (stepFunction) {
-            case "fieldChanged":
-                new Action({
+        let stepDetails = ParseActionDetails( Base64Decode( GetNodeData(step, "stepDetails") ));
+        switch (stepType) {
+            case "F":   // Filter
+                action = new Action({
                     actionName: "",
                     stepID: i,
-                    actionType: "",
-                    actionDetails: "",
-                    nextAction: ""
+                    actionType: stepFunction,
+                    actionDetails: stepDetails,
+                    nextAction: undefined,
+                })
+                break;
+            
+            case "A":   // Action
+                action = new Action({
+                    actionName: "",
+                    stepID: i,
+                    actionType: stepFunction,
+                    actionDetails: stepDetails,
+                    nextAction: undefined,
                 })
                 break;
         
@@ -153,6 +167,12 @@ function ParseActions(ActionsXML) {
                 console.error("Error! Parsing Actions Failed on Function switcher!");
                 break;
         }
+
+        if (prevAction !== undefined) {
+            prevAction.nextAction = action;
+        }
+        prevAction = action;
+        actions.push(action);
     }
 
 
@@ -162,7 +182,44 @@ function ParseActions(ActionsXML) {
 // this function parses Action details into something readable
 // takes in decoded base64 and returns array of details about step (Maybe, not sure of return format yet)
 function ParseActionDetails(stepDetails) {
-    let result = "";
+    let result = [];
+    // let tokens = stepDetails.split(";");
+    let tokens = stepDetails.split(/(?!")\w+(?!")/g);
+    // tokens[0] = tokens[0].split("{")[1];
+    // tokens.pop();
+
+    let i = 0;
+    while (i < tokens.length) {
+        let token = tokens[i].inclu;
+
+        if (tokens[i].includes("andOr")) {
+            result[i] = tokens[i+1].split('"')[1];
+        }
+
+        if (tokens[i].includes("stepFunction")) {
+            result[i] = tokens[i+1].split('"')[1];
+        }
+
+        if (tokens[i].includes("field")) {
+            result[i] = tokens[i+1].split('"')[1];
+        }
+
+        if (tokens[i].includes("operator")) {
+            result[i] = tokens[i+1].split('"')[1];
+        }
+
+        if (tokens[i].includes("value")) {
+            result[i] = tokens[i+1].split('"')[1];
+        }
+
+        
+        i++;
+    }
+
+    // "a:1:{s:12:"stepFunction";s:9:"waitDelay";}"
+    // "a:3:{s:5:"andOr";s:3:"and";s:12:"stepFunction";s:12:"fieldChanged";s:5:"field";s:9:"194969106";}"
+    // "a:5:{s:5:"andOr";s:3:"and";s:12:"stepFunction";s:15:"fieldValueMatch";s:5:"field";s:9:"194969106";s:8:"operator";s:2:"eq";s:5:"value";s:8:"Complete";}"
+    
 
     return result;
 }
