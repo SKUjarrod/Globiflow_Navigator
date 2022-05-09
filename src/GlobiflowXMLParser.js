@@ -184,36 +184,49 @@ function ParseActions(ActionsXML) {
 function ParseActionDetails(stepDetails) {
     let result = [];
     // let tokens = stepDetails.split(";");
-    let tokens = stepDetails.split(/(?!")\w+(?!")/g);
+    let tokens = [];
+    let tempTokens = stepDetails.split(/(\w+)(?=";)/g);
+    for (let i = 1; i < tempTokens.length; i+=2) {
+        const element = tempTokens[i];
+        tokens.push(element);    
+    }
     // tokens[0] = tokens[0].split("{")[1];
     // tokens.pop();
 
     let i = 0;
     while (i < tokens.length) {
-        let token = tokens[i].inclu;
 
         if (tokens[i].includes("andOr")) {
-            result[i] = tokens[i+1].split('"')[1];
+            result.push(tokens[i+1]);
         }
 
         if (tokens[i].includes("stepFunction")) {
-            result[i] = tokens[i+1].split('"')[1];
+            result.push(tokens[i+1]);
         }
 
         if (tokens[i].includes("field")) {
-            result[i] = tokens[i+1].split('"')[1];
+            result.push(tokens[i+1]);
         }
 
         if (tokens[i].includes("operator")) {
-            result[i] = tokens[i+1].split('"')[1];
+            result.push(tokens[i+1]);
         }
 
         if (tokens[i].includes("value")) {
-            result[i] = tokens[i+1].split('"')[1];
+            result.push(tokens[i+1]);
         }
 
+        if (tokens[i].includes("varName")) {
+            result.push(tokens[i+1]);
+        }
+
+        // if (tokens[i].includes("eval")) {   // dont know if eval is needed
+        //     result.push(tokens[i]);
+        // }
+
         
-        i++;
+        
+        i+=2;
     }
 
     // "a:1:{s:12:"stepFunction";s:9:"waitDelay";}"
