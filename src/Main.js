@@ -52,7 +52,7 @@ document.getElementById('workplaceSelect').addEventListener("change", (e) => {
 
 var appObjectArray = [];
 var globalObjectsArray = []; // This is the Global Master copy of every object in the scene. Includes element and raw data. Array structure: Physical Element, Data Structure
-var objectAddBuffer = []; // Used as a stack strucutre because O(1). Looked into a Queue structure but they O(n)
+var objectAddBuffer = []; // Used for adding new objects to scenes //Used as a stack strucutre because O(1). Looked into a Queue structure but they O(n)
 var stage = new Two.Group();
 stage.id = "Stage Group";
 var connections = new Two.Group();
@@ -74,7 +74,7 @@ function CreateVisualElement() {
 
         appGroup = MakeAppElement(data);
 
-        let group = MakeElement(data);
+        let group = MakeFlow(data);
 
         element.object = group;
         group.dataStructure = data;

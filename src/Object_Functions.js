@@ -6,7 +6,7 @@ let currentlyOpenedGroup;
 let currentlyOpenedAppGroup;
 
 // Make a new object. This is the base call that will call further functions to construct the final object
-function MakeElement(currentObj) {
+function MakeFlow(currentObj) {
     let group = two.makeGroup();
     group.id = "Flow Group";
     group.visible = false;
@@ -14,32 +14,33 @@ function MakeElement(currentObj) {
     // group.position.x = currentObj.groupPositionOffset.x;
     // group.position.y = currentObj.groupPositionOffset.y;
 
-    CreateElement(group, currentObj);
-    CreateElementDetails(group, currentObj);
+    CreateFlow(group, currentObj);
+    CreateFlowDetails(group, currentObj);
 
     // connections aren't part of element group
-    CreateElementConnectionArrow(currentObj);
+    CreateFlowConnectionArrow(currentObj);
     return group;
 }
 
 // draw object box from object data
-function CreateElement(group, currentObj) {
+function CreateFlow(group, currentObj) {
     let rect = two.makeRectangle(0, 0, flowSize, flowSize);
     rect.id = "Flow rect";
     two.update();
-    group._renderer.elem.addEventListener('click', (e) => {two.update(); selectElement(group);}, false);
+    group._renderer.elem.addEventListener('click', (e) => {two.update(); selectFlow(group);}, false);
     group.add(rect);
 
     // stage.add(rect);
 }
 
 // create all the details inside the object box
-function CreateElementDetails(group, currentObj) {
+function CreateFlowDetails(group, currentObj) {
     let detailArray = [];
     // caching details
     let nameText = currentObj.flowName;
-    let IdText = currentObj.flowID;
-    let TestText = "";
+    let IDText = currentObj.flowID;
+    let detailsArray = currentObj.flowActions;
+    let testText = "";
 
 
     let nameTextObject = new Two.Text(nameText, 0, - 10, 'normal');
@@ -47,15 +48,29 @@ function CreateElementDetails(group, currentObj) {
     nameTextObject.size = 10;
     detailArray.push(nameTextObject);
 
-    let IdTextObject = new Two.Text("ID: " + IdText, 0, 0, 'normal');
+    let IdTextObject = new Two.Text("ID: " + IDText, 0, 10, 'normal');
     IdTextObject.id = "IdTextObject";
     IdTextObject.size = 10;
     detailArray.push(IdTextObject);
 
-    let testTextObject = new Two.Text("test: " + TestText, 0, 10, 'normal');
-    testTextObject.id = "testTextObject";
-    testTextObject.size = 10;
-    detailArray.push(testTextObject);
+    let actionsTitleObject = new Two.Text("Actions: ", 0, 0, 'normal');
+    actionsTitleObject.id = "actionsTitleObject";
+    actionsTitleObject.size = 10;
+    actionsTitleObject.visible = false;
+    detailArray.push(actionsTitleObject);
+
+    for (let i = 0; i < detailsArray.length; i++) {
+        let actionsObject = new Two.Text("* " + detailsArray[i].actionType, 0, 10 + (10*i), 'normal');
+        actionsObject.id = "actionsObject";
+        actionsObject.size = 10;
+        actionsObject.visible = false;
+        detailArray.push(actionsObject);
+    }
+
+    // let testTextObject = new Two.Text("test: " + testText, 0, 10, 'normal');
+    // testTextObject.id = "testTextObject";
+    // testTextObject.size = 10;
+    // detailArray.push(testTextObject);
 
 
     // loop through all detailArray items and add them to group
@@ -69,7 +84,7 @@ function CreateElementDetails(group, currentObj) {
 }
 
 // create all the connections between objects
-function CreateElementConnectionArrow(currentObj) {
+function CreateFlowConnectionArrow(currentObj) {
     for (let j = 0; j < max; j++) {
         let obj = globalObjectsArray[j].data;
         let lineObj = two.makeLine(currentObj.groupPositionOffset.x, currentObj.groupPositionOffset.y, obj.groupPositionOffset.x, obj.groupPositionOffset.y);
@@ -80,18 +95,18 @@ function CreateElementConnectionArrow(currentObj) {
 }
 
 // selects the element by scaling element group and performing other functions to make it look like its selected. All purely visual
-function selectElement(selectedGroup) {
+function selectFlow(selectedGroup) {
     let operationDone = false;
     // let foundGroup = globalObjectsArray.find( ({ object }) => object === selectedGroup); // super inefficent, especially at larger search volumes. change this by reading groups dataStructure property   
 
     // close Elements
     if (currentlyOpenedGroup != undefined) { 
         if (currentlyOpenedGroup != selectedGroup) {
-            CloseBox(currentlyOpenedGroup, selectedGroup.dataStructure);
+            CloseFlow(currentlyOpenedGroup, selectedGroup.dataStructure);
         }
         // maybe put below condition in an else from above condition
         if (selectedGroup.dataStructure.selected == true && operationDone != true) {
-            CloseBox(selectedGroup, selectedGroup.dataStructure);
+            CloseFlow(selectedGroup, selectedGroup.dataStructure);
             operationDone = true;
         }
     }
@@ -99,17 +114,17 @@ function selectElement(selectedGroup) {
     // open Elements
     if (currentlyOpenedGroup == undefined) {
         if (selectedGroup.dataStructure.selected != true && operationDone != true) {
-            OpenBox(selectedGroup, selectedGroup.dataStructure);
+            Openflow(selectedGroup, selectedGroup.dataStructure);
             operationDone = true;
         }
     }
 
     // opens boxes. params: selectedGroup, foundGroup
-    function OpenBox(boxElem) {
+    function Openflow(boxElem) {
         boxElem.children[0].matrix.manual = true;
         boxElem.children[0].matrix.scale(2, 4);
         boxElem.dataStructure.selected = true;
-        FocusElement(boxElem);
+        FocusFlow(boxElem);
     
         currentlyOpenedGroup = boxElem;
     }
@@ -118,47 +133,49 @@ function selectElement(selectedGroup) {
 
 // has to be outside scope of selectElement function because closing apps uses this function
 // closes boxes. params: selectedGroup, foundGroup
-function CloseBox(boxElem) {
+function CloseFlow(boxElem) {
     boxElem.children[0].matrix.scale(0.5, 0.25);
     two.update();
     boxElem.children[0].matrix.manual = false;
     boxElem.dataStructure.selected = false;
-    deFocusElement(boxElem);
+    deFocusFlow(boxElem);
 
     currentlyOpenedGroup = undefined;
 }
 
 // shows all extra details from flow 
-function FocusElement(boxElem) {
-    
+function FocusFlow(boxElem) {
+    // let focusElement = boxElem.children[1];
+    // boxElem.parent.children.shift(boxElem.parent.children.unshift());
+
     //adjust the 3 quick display text to focused extended view
-    boxElem.children[1].position.set(0, -50);
-    boxElem.children[2].position.set(0, 0);
-    boxElem.children[3].position.set(0, 20);
+    boxElem.children[1].position.set(0, -70);
+    boxElem.children[2].position.set(0, -40);
+    // boxElem.children[3].position.set(0, -20);
 
-
+    
     // i = 4, this is because the quick display text is always visible. Only the flows hidden extra details should be shown
-    for (let i = 4; i < boxElem.children.length; i++) {
-        const element = boxElem.children[i];
-        element.visible = false;
+    for (let i = 3; i < boxElem.children.length; i++) {
+        const element = boxElem.children[i];      
+        element.visible = true;
     }
     two.update();
 }
 
 
 // hides all extra details from flow
-function deFocusElement(boxElem) {
+function deFocusFlow(boxElem) {
     
     //adjust the 3 quick display text back to original quick display locations
     boxElem.children[1].position.set(0, -10);
     boxElem.children[2].position.set(0, 0);
-    boxElem.children[3].position.set(0, 10);
+    // boxElem.children[3].position.set(0, 10);
 
 
     // i = 4, this is because the quick display text is always visible. Only the flows hidden extra details should be shown
-    for (let i = 4; i < boxElem.children.length; i++) {
+    for (let i = 3; i < boxElem.children.length; i++) {
         const element = boxElem.children[i];
-        element.visible = true;
+        element.visible = false;
     }
     two.update();
 }
@@ -288,7 +305,7 @@ function deFocusApp(appElem) {
         const element = appElem.children[i];
         if (element.id == "Flow Group") {
             if (element.dataStructure.selected) {
-                CloseBox(element, element.dataStructure);
+                CloseFlow(element, element.dataStructure);
             }
             element.visible = false;
         }
@@ -299,7 +316,6 @@ function deFocusApp(appElem) {
 
 
 
-// add a dissable zoom and pan key so you can copy values from the screen. Maybe Left control or alt key when pressed down
 // ZUI is all the zoom and pan functionality
 function addZUI() {
     var zuiStage = new Two.ZUI(stage); // forground elements
@@ -310,33 +326,37 @@ function addZUI() {
     zuiConnections.addLimits(0.06, 8);
   
     domElement.addEventListener('mousedown', mousedown, false);
-    domElement.addEventListener('mousewheel', mousewheel, false);
-    domElement.addEventListener('wheel', mousewheel, false);
-  
+    domElement.addEventListener('mousewheel', mousewheel, {passive: true});
+    domElement.addEventListener('wheel', mousewheel, {passive: true});
+
+
     function mousedown(e) {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-      window.addEventListener('mousemove', mousemove, false);
-      window.addEventListener('mouseup', mouseup, false);
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+        window.addEventListener('mousemove', mousemove, false);
+        window.addEventListener('mouseup', mouseup, false);
     }
     
     function mousemove(e) {
-      var dx = e.clientX - mouse.x;
-      var dy = e.clientY - mouse.y;
-      zuiStage.translateSurface(dx, dy);
-      zuiConnections.translateSurface(dx, dy);
-      mouse.set(e.clientX, e.clientY);
+        if (!e.altKey) {
+            var dx = e.clientX - mouse.x;
+            var dy = e.clientY - mouse.y;
+            zuiStage.translateSurface(dx, dy);
+            zuiConnections.translateSurface(dx, dy);
+            mouse.set(e.clientX, e.clientY);
+        }
     }
     
     function mouseup(e) {
-      window.removeEventListener('mousemove', mousemove, false);
-      window.removeEventListener('mouseup', mouseup, false);
-      // two.update();
+        window.removeEventListener('mousemove', mousemove, false);
+        window.removeEventListener('mouseup', mouseup, false);
     }
   
     function mousewheel(e) {
-      var dy = (e.wheelDeltaY || - e.deltaY) / 1000;
-      zuiStage.zoomBy(dy, e.clientX, e.clientY);
-      zuiConnections.zoomBy(dy, e.clientX, e.clientY);
+        if (!e.altKey) {
+            var dy = (e.wheelDeltaY || - e.deltaY) / 1000;
+            zuiStage.zoomBy(dy, e.clientX, e.clientY);
+            zuiConnections.zoomBy(dy, e.clientX, e.clientY);
+        }
     }
   }

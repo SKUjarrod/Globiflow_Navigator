@@ -7,6 +7,8 @@
 
 globiflowXMLParser line 187 fix regex so that it only selects whole words without the "", tokenising the stepDetails string
 
+work on app and flow ordering with twojs
+
 work on Actions class and creating Actions
 create view for focused elements
 
