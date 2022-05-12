@@ -5,10 +5,13 @@
 let currentlyOpenedGroup;
 let currentlyOpenedAppGroup;
 
+
 // Make a new object. This is the base call that will call further functions to construct the final object
 function MakeFlow(currentObj) {
     let group = two.makeGroup();
     group.id = "Flow Group";
+    group.uID = nextAvailableUID;
+    nextAvailableUID++;
     group.visible = false;
 
     // group.position.x = currentObj.groupPositionOffset.x;
@@ -26,6 +29,8 @@ function MakeFlow(currentObj) {
 function CreateFlow(group, currentObj) {
     let rect = two.makeRectangle(0, 0, flowSize, flowSize);
     rect.id = "Flow rect";
+    rect.uID = nextAvailableUID;
+    nextAvailableUID++;
     two.update();
     group._renderer.elem.addEventListener('click', (e) => {two.update(); selectFlow(group);}, false);
     group.add(rect);
@@ -36,25 +41,30 @@ function CreateFlow(group, currentObj) {
 // create all the details inside the object box
 function CreateFlowDetails(group, currentObj) {
     let detailArray = [];
+
     // caching details
     let nameText = currentObj.flowName;
     let IDText = currentObj.flowID;
     let detailsArray = currentObj.flowActions;
-    let testText = "";
-
 
     let nameTextObject = new Two.Text(nameText, 0, - 10, 'normal');
     nameTextObject.id = "nameTextObject";
+    nameTextObject.uID = nextAvailableUID;
+    nextAvailableUID++
     nameTextObject.size = 10;
     detailArray.push(nameTextObject);
 
     let IdTextObject = new Two.Text("ID: " + IDText, 0, 10, 'normal');
     IdTextObject.id = "IdTextObject";
+    IdTextObject.uID = nextAvailableUID;
+    nextAvailableUID++;
     IdTextObject.size = 10;
     detailArray.push(IdTextObject);
 
     let actionsTitleObject = new Two.Text("Actions: ", 0, 0, 'normal');
     actionsTitleObject.id = "actionsTitleObject";
+    actionsTitleObject.uID = nextAvailableUID;
+    nextAvailableUID++;
     actionsTitleObject.size = 10;
     actionsTitleObject.visible = false;
     detailArray.push(actionsTitleObject);
@@ -62,6 +72,8 @@ function CreateFlowDetails(group, currentObj) {
     for (let i = 0; i < detailsArray.length; i++) {
         let actionsObject = new Two.Text("* " + detailsArray[i].actionType, 0, 10 + (10*i), 'normal');
         actionsObject.id = "actionsObject";
+        actionsObject.uID = nextAvailableUID;
+        nextAvailableUID++;
         actionsObject.size = 10;
         actionsObject.visible = false;
         detailArray.push(actionsObject);
@@ -77,9 +89,6 @@ function CreateFlowDetails(group, currentObj) {
     for (let index = 0; index < detailArray.length; index++) {
         const detail = detailArray[index];
         group.add(detail);
-
-        // two.scene.add(detail);
-        // stage.add(detail);
     }
 }
 
@@ -89,6 +98,8 @@ function CreateFlowConnectionArrow(currentObj) {
         let obj = globalObjectsArray[j].data;
         let lineObj = two.makeLine(currentObj.groupPositionOffset.x, currentObj.groupPositionOffset.y, obj.groupPositionOffset.x, obj.groupPositionOffset.y);
         lineObj.id = "Connection Line";
+        lineObj.uID = nextAvailableUID;
+        nextAvailableUID++;
         // stage.add(lineObj);
         connections.add(lineObj);
     }
@@ -128,7 +139,6 @@ function selectFlow(selectedGroup) {
     
         currentlyOpenedGroup = boxElem;
     }
-
 }
 
 // has to be outside scope of selectElement function because closing apps uses this function
@@ -143,10 +153,18 @@ function CloseFlow(boxElem) {
     currentlyOpenedGroup = undefined;
 }
 
+let originalFlowOrderIndex = 0;
+
 // shows all extra details from flow 
 function FocusFlow(boxElem) {
-    // let focusElement = boxElem.children[1];
-    // boxElem.parent.children.shift(boxElem.parent.children.unshift());
+    let orderArrayRef = boxElem.parent.children;
+    let temp = orderArrayRef.find(function(Elem, index) {
+        originalFlowOrderIndex = index;
+        return Elem.uID === boxElem.uID;
+    });
+
+    orderArrayRef.splice(originalFlowOrderIndex, 1);
+    orderArrayRef.unshift(temp);
 
     //adjust the 3 quick display text to focused extended view
     boxElem.children[1].position.set(0, -70);
@@ -166,6 +184,10 @@ function FocusFlow(boxElem) {
 // hides all extra details from flow
 function deFocusFlow(boxElem) {
     
+    let orderArrayRef = boxElem.parent.children;
+    let elem = orderArrayRef.shift();
+    orderArrayRef.splice(originalFlowOrderIndex, 0, elem);
+
     //adjust the 3 quick display text back to original quick display locations
     boxElem.children[1].position.set(0, -10);
     boxElem.children[2].position.set(0, 0);
@@ -192,6 +214,8 @@ function MakeAppElement(currentObjData) {
     } else {
         group = two.makeGroup();
         group.id = "App Group";
+        group.uID = nextAvailableUID;
+        nextAvailableUID++;
 
         SetAppOffsets(group, currentObjData.groupPositionOffset.x, currentObjData.groupPositionOffset.y)
 
@@ -200,8 +224,6 @@ function MakeAppElement(currentObjData) {
         CreateAppDetails(group, currentObjData);
         appObjectArray.push(group);
     }
-
-
 
     return group;
 }
@@ -225,6 +247,9 @@ function GetAppGroupInGlobalObjects(currentObjData) {
 function CreateAppElement(group, currentObjData) {
     let rect = two.makeRectangle(0, 0, appSize, appSize);
     rect.id = "App rect";
+    rect.uID = nextAvailableUID;
+    nextAvailableUID++;
+    
     // rect.verticies
     two.update();
     rect._renderer.elem.addEventListener('click', (e) => {two.update(); SelectApp(group);}, false);
@@ -234,6 +259,8 @@ function CreateAppElement(group, currentObjData) {
 function CreateAppDetails(group, currentObjData) {
     let nameTextObject = new Two.Text(currentObjData.appName, 0, (-(appSize/2)+17), 'normal');
     nameTextObject.id = "nameTextObject";
+    nameTextObject.uID = nextAvailableUID;
+    nextAvailableUID++;
     nameTextObject.size = 15;
 
     group.add(nameTextObject);
@@ -288,8 +315,19 @@ function SelectApp(currentAppGroup) {
     }
 }
 
+let originalAppOrderIndex = 0;
+
 // shows all extra details from app 
 function FocusApp(appElem) {
+    let orderArrayRef = appElem.parent.children;
+    let temp = orderArrayRef.find(function(Elem, index) {
+        originalAppOrderIndex = index;
+        return Elem.uID === appElem.uID;
+    });
+
+    orderArrayRef.splice(originalAppOrderIndex, 1);
+    orderArrayRef.unshift(temp);
+
     for (let i = 0; i < appElem.children.length; i++) {
         const element = appElem.children[i];
         if (element.id == "Flow Group") {
@@ -301,6 +339,11 @@ function FocusApp(appElem) {
 
 // hides all extra details from app
 function deFocusApp(appElem) {
+
+    let orderArrayRef = appElem.parent.children;
+    let elem = orderArrayRef.shift();
+    orderArrayRef.splice(originalAppOrderIndex, 0, elem);
+
     for (let i = 0; i < appElem.children.length; i++) {
         const element = appElem.children[i];
         if (element.id == "Flow Group") {
@@ -316,6 +359,7 @@ function deFocusApp(appElem) {
 
 
 
+// dont know if ZUI needs a uID, not sure if it creates a physical element in the DOM
 // ZUI is all the zoom and pan functionality
 function addZUI() {
     var zuiStage = new Two.ZUI(stage); // forground elements

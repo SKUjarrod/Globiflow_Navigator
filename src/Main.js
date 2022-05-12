@@ -53,10 +53,16 @@ document.getElementById('workplaceSelect').addEventListener("change", (e) => {
 var appObjectArray = [];
 var globalObjectsArray = []; // This is the Global Master copy of every object in the scene. Includes element and raw data. Array structure: Physical Element, Data Structure
 var objectAddBuffer = []; // Used for adding new objects to scenes //Used as a stack strucutre because O(1). Looked into a Queue structure but they O(n)
+
+var nextAvailableUID = 0;  // this is the next avaliable uID number. This should increment any time a new twojs object is created, from groups to actual text objects, etc.
 var stage = new Two.Group();
 stage.id = "Stage Group";
+stage.uID = nextAvailableUID;
+nextAvailableUID++;
 var connections = new Two.Group();
 connections.id = "Connections Group";
+connections.uID = nextAvailableUID;
+nextAvailableUID
 
 let max = 1;//globalObjectsArray.length + 1; //currently used for creating connection lines
 

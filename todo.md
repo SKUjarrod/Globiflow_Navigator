@@ -3,11 +3,15 @@
  https://codepen.io/jonobr1/pen/wvqRLbR?editors=0010 morphing verticies for appObject opening and closing
  https://workflow-automation.podio.com/help/using-actions.php All Actions in globiflow
 
+ https://developers.podio.com/ Podio and globiflow API. Could possible change over model to this
+
 * TODO LIST 
 
 globiflowXMLParser line 187 fix regex so that it only selects whole words without the "", tokenising the stepDetails string
 
-work on app and flow ordering with twojs
+work on auto resizing flows such that all text and details fit within bounds correctly
+
+look at possible Globiflow API integration
 
 work on Actions class and creating Actions
 create view for focused elements
