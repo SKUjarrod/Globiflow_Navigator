@@ -1,0 +1,5 @@
+{
+    "require": {
+        "podio-community/podio-php": "^6.0"
+    }
+}
