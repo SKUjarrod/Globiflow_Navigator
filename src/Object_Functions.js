@@ -166,6 +166,8 @@ function FocusFlow(boxElem) {
     orderArrayRef.splice(originalFlowOrderIndex, 1);
     orderArrayRef.unshift(temp);
 
+    // use getBoundingClientRect() function to find bounding box of flow. Do some magic and make it size perfectly
+
     //adjust the 3 quick display text to focused extended view
     boxElem.children[1].position.set(0, -70);
     boxElem.children[2].position.set(0, -40);

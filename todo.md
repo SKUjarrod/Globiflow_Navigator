@@ -12,6 +12,8 @@ globiflowXMLParser line 187 fix regex so that it only selects whole words withou
 work on auto resizing flows such that all text and details fit within bounds correctly
 
 look at possible Globiflow API integration
+move html, css and js to be called from index.php
+!!!move everything onto dedicated server, cant keep using built in server as it doesn't serve static files correctly and is the reason why all files in dev tools are the same!!!
 
 work on Actions class and creating Actions
 create view for focused elements
