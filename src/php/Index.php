@@ -17,7 +17,7 @@ require_once __DIR__ . '\GlobiflowAPIHandler.php';
 
 // display html
 $file = "C:/xampp/htdocs/src/html/index.html";
-echo file_get_contents($file);
+// echo file_get_contents($file);
 //
 
 

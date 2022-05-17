@@ -57,11 +57,13 @@ elseif (isset($_GET['code'])) {
 ///////////////////////////////////////
 
 if (Podio::is_authenticated()) {
-  print_r(
-    // PodioOrganization::get_all()
-    PodioSpace::get_available("139615")
-    // PodioApp::get_for_space($app_id, $app_token);
+  // $orgs = PodioOrganization::get_all();
+  // print_r($orgs);
+  $spaces = PodioSpace::get_for_org("139615");
+  print_r($spaces);
+  // $apps = PodioApp::get_for_space($app_id, $app_token);
+  // print_r($apps);
 
-    );
 }
+
 ?>
