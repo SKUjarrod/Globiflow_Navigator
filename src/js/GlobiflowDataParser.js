@@ -21,6 +21,22 @@ function startXMLParse(fileName, XMLResult) {
     }
 }
 
+var httpRequest = new XMLHttpRequest;
+httpRequest.onreadystatechange = function(){
+    if (httpRequest.readyState === 4) { // Request is done
+        if (httpRequest.status === 200) { // successfully
+            startPodioAPIParse(httpRequest.responseText); // We're calling our method
+        }
+    }
+};
+httpRequest.open('GET', "/src/php/GlobiflowAPIHandler.php");
+httpRequest.send();
+
+
+function startPodioAPIParse(data) {
+    console.log(data);
+}
+
 // Extract Data from read XML Dom element to be used to generate data structure
 function ExtractDatafromXMLDOM(XMLDOM) {
     let data = {
