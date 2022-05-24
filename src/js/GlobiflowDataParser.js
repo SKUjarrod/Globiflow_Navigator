@@ -29,7 +29,7 @@ httpRequest.onreadystatechange = function(){
         }
     }
 };
-httpRequest.open('GET', "/src/php/GlobiflowAPIHandler.php");
+httpRequest.open('GET', "/src/php/test.php?a=123&b=321", true);
 httpRequest.send();
 
 
