@@ -4,6 +4,51 @@ let filesParsed = 0;
 let parser = new DOMParser();
 let xmlDoc;
 
+///////////////////////////
+//   Podio API Parsing   //
+///////////////////////////
+
+// make this into a function that is called from some html button to use podio API instead of local file. Could possibly do this logic on the server when user authenitcates, giving them choice between podio api and file
+var httpRequest = new XMLHttpRequest;
+httpRequest.onreadystatechange = function(){
+    if (httpRequest.readyState === 4) { // Request is done
+        if (httpRequest.status === 200) { // successfully
+            startPodioAPIParse(httpRequest.responseText); // We're calling our method
+        }
+    }
+};
+httpRequest.open('GET', "/src/php/GlobiflowAPIHandler.php?apiType=getSpace", true);
+httpRequest.send();
+
+
+function startPodioAPIParse(data) {
+    var apiData = JSON.parse(data);
+
+    for (let i = 0; i < apiData.length; i++) {
+        const space = apiData[i];
+        for (let j = 0; j < space.spaceApps.length; j++) {
+            const app = space.spaceApps[j];
+
+            let data = {
+                _flowName: '',
+                _flowID: '',
+                _description: '',
+                _appID: app.appID,
+                _appName: app.appName,
+                _workSpace: space.spaceName,
+                _actions: '',
+            };
+            
+            GenerateDataStructure(data);
+        }
+    }
+    // console.log(data);
+}
+
+////////////////////////
+//    File Parsing    //
+////////////////////////
+
 // this is the base XMLParsing function. Call this to start a XML parse on a xml file that has been read into a string
 function startXMLParse(fileName, XMLResult) {
     xmlDoc = parser.parseFromString(XMLResult, "text/xml");
@@ -19,22 +64,6 @@ function startXMLParse(fileName, XMLResult) {
         // CreateVisualElement(); // maybe move this to FileIO.js in the multi file reader function so it only runs once when all files have been read. Currently its not batching and running every file which isnt really batching
         filesParsed++;
     }
-}
-
-var httpRequest = new XMLHttpRequest;
-httpRequest.onreadystatechange = function(){
-    if (httpRequest.readyState === 4) { // Request is done
-        if (httpRequest.status === 200) { // successfully
-            startPodioAPIParse(httpRequest.responseText); // We're calling our method
-        }
-    }
-};
-httpRequest.open('GET', "/src/php/test.php?a=123&b=321", true);
-httpRequest.send();
-
-
-function startPodioAPIParse(data) {
-    console.log(data);
 }
 
 // Extract Data from read XML Dom element to be used to generate data structure
