@@ -9,16 +9,34 @@ let xmlDoc;
 ///////////////////////////
 
 // make this into a function that is called from some html button to use podio API instead of local file. Could possibly do this logic on the server when user authenitcates, giving them choice between podio api and file
+// $('#AuthLink').click(getPodioData());
+// if ($('#AuthMsg').filter(( elem ) => { return elem == "You were already authenticated and no authentication is needed." })) {getPodioData()};
+
 var httpRequest = new XMLHttpRequest;
-httpRequest.onreadystatechange = function(){
-    if (httpRequest.readyState === 4) { // Request is done
-        if (httpRequest.status === 200) { // successfully
+function getPodioData() {
+    httpRequest.onreadystatechange = function(){
+        if (httpRequest.readyState === 4) { // Request is done
+            if (httpRequest.status === 200) { // successfully
+            startPodioAPIParse(httpRequest.responseText); // We're calling our method
+            }
+        }
+    };
+    httpRequest.open('GET', "/src/php/GlobiflowAPIHandler.php?apiType=getSpace", true);
+    httpRequest.send();
+}
+getPodioFlowData();
+
+function getPodioFlowData() {
+    httpRequest.onreadystatechange = function(){
+        if (httpRequest.readyState === 4) { // Request is done
+            if (httpRequest.status === 200) { // successfully
             startPodioAPIParse(httpRequest.responseText); // We're calling our method
         }
     }
 };
-httpRequest.open('GET', "/src/php/GlobiflowAPIHandler.php?apiType=getSpace", true);
+httpRequest.open('GET', "/src/php/GlobiflowAPIHandler.php?apiType=getFlow", true);
 httpRequest.send();
+}
 
 
 function startPodioAPIParse(data) {

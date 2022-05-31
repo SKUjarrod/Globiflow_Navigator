@@ -20,14 +20,14 @@ if (!Podio::is_authenticated()) {
       // User is not being redirected and does not have an active session
       // We just display a link to the authentication page on podio.com
       $auth_url = htmlentities(Podio::authorize_url(REDIRECT_URI, SCOPE));
-      print "<a href='{$auth_url}'>Start authenticating</a>";
+      print "<a href='{$auth_url}' id='AuthLink'>Start authenticating</a>";
       
     } elseif (Podio::is_authenticated()) {
       // User already has an active session. You can make API calls here:
       print "You were already authenticated and no authentication is needed.";
 
     }
-  elseif (isset($_GET['code'])) {
+    elseif (isset($_GET['code'])) {
     // User is being redirected back from podio.com after authenticating.
     // The authorization code is available in $_GET['code']
     // We use it to finalize the authentication
@@ -54,6 +54,7 @@ if (!Podio::is_authenticated()) {
 // display html
 $file = "C:/xampp/htdocs/src/html/index.html";
 echo file_get_contents($file);
+// echo "<script>getPodioData();</script>";
 //
 
 ?>
