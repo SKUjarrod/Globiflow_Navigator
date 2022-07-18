@@ -58,6 +58,8 @@ if (Podio::is_authenticated() && count($_GET) > 0 ) {
       echo json_encode($spaces);
       break;
 
+
+      // work on get flow case
     case 'getFlow':
       $url = "https://workflow-automation.podio.com/flows.php";
       $ch = curl_init($url);

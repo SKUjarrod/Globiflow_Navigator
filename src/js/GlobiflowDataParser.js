@@ -76,8 +76,8 @@ function startXMLParse(fileName, XMLResult) {
     if (CheckFileCompatability(fileName, xmlDoc)) {
         data = ExtractDatafromXMLDOM(xmlDoc);
         
-        // CalculateConnections(/*param of flow to find connections to and from here*/ "test");
-        GenerateDataStructure(data);
+        let flowData = GenerateDataStructure(data);
+        CalculateConnections(flowData.data);
 
         // CreateVisualElement(); // maybe move this to FileIO.js in the multi file reader function so it only runs once when all files have been read. Currently its not batching and running every file which isnt really batching
         filesParsed++;
@@ -165,6 +165,7 @@ function GenerateDataStructure(readData) {
     globalObjectsArray.push(object);
     objectAddBuffer.push(object);
 
+    return object;
     // Once flowDataStructure has been added to global arrays, create its app
 }
 
@@ -177,7 +178,10 @@ function GenerateDataStructure(readData) {
 //  If it doesn't exists then create a placeholder dataStructure as it may not have been imported yet.
 //  placeholder dataStructure must be created in a way that when it is imported, it must be able to link to that and just import data into dataStructure and not create a new object!
 function CalculateConnections(Flow) {
-    
+    for (let i = 0; i < Flow.flowActions.length; i++) {
+        const element = Flow.flowActions[i];
+        
+    }
 }
 
 // decode a base64 encoded string
@@ -186,6 +190,11 @@ function Base64Decode(base64Encoded) {
 
     return result;
 }
+
+// make enum of all actions names and a function that maps stepFunctions from flow json into action names
+// enum actionNames {
+
+// }
 
 function ParseActions(ActionsXML) {
     let actions = [];
@@ -242,6 +251,8 @@ function ParseActions(ActionsXML) {
     return actions;
 }
 
+// need to refactor this function. Combine (somehow) the for and while loop. This current setup works fine for normal actions but for variables it doesn't meet the stepdetails.split and isn't added to tokens, then in the while loop theres no way to reference the split variables token and push it to results
+
 // this function parses Action details into something readable
 // takes in decoded base64 and returns array of details about step (Maybe, not sure of return format yet)
 function ParseActionDetails(stepDetails) {
@@ -283,11 +294,10 @@ function ParseActionDetails(stepDetails) {
             result.push(tokens[i+1]);
         }
 
-        // if (tokens[i].includes("eval")) {   // dont know if eval is needed
-        //     result.push(tokens[i]);
-        // }
-
-        
+        if (tokens[i].includes("eval")) {   // broken. Read comment above function
+            let varEval = tempTokens[i+1].split(/\*[a-zA-z_-]+\*/g);
+            result.push(varEval);
+        }
         
         i+=2;
     }
