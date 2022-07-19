@@ -192,9 +192,9 @@ function Base64Decode(base64Encoded) {
 }
 
 // make enum of all actions names and a function that maps stepFunctions from flow json into action names
-// enum actionNames {
-
-// }
+const actionNames = {
+    customPrep: "varName"
+}
 
 function ParseActions(ActionsXML) {
     let actions = [];
@@ -214,6 +214,7 @@ function ParseActions(ActionsXML) {
         let stepType = GetNodeData(step, "stepType");
         let stepFunction = GetNodeData(step, "stepFunction");
         let stepDetails = ParseActionDetails( Base64Decode( GetNodeData(step, "stepDetails") ));
+        let stepName = GetActionData()
         switch (stepType) {
             case "F":   // Filter
                 action = new Action({
@@ -227,7 +228,7 @@ function ParseActions(ActionsXML) {
             
             case "A":   // Action
                 action = new Action({
-                    actionName: "",
+                    actionName: (stepFunction) => {return stepDetails.find( (stepFunction,i) => {stepDetails[i+1]} )},  // use step function in enum to determine what name type is. Then find name type e.g. VarName. When found name type then i+1 to get name type value
                     stepID: i,
                     actionType: stepFunction,
                     actionDetails: stepDetails,
@@ -247,65 +248,46 @@ function ParseActions(ActionsXML) {
         actions.push(action);
     }
 
-
     return actions;
 }
-
-// need to refactor this function. Combine (somehow) the for and while loop. This current setup works fine for normal actions but for variables it doesn't meet the stepdetails.split and isn't added to tokens, then in the while loop theres no way to reference the split variables token and push it to results
 
 // this function parses Action details into something readable
 // takes in decoded base64 and returns array of details about step (Maybe, not sure of return format yet)
 function ParseActionDetails(stepDetails) {
-    let result = [];
-    // let tokens = stepDetails.split(";");
-    let tokens = [];
-    let tempTokens = stepDetails.split(/(\w+)(?=";)/g);
-    for (let i = 1; i < tempTokens.length; i+=2) {
-        const element = tempTokens[i];
-        tokens.push(element);    
+    let result = [];    
+    let tokens = stepDetails.match( new RegExp(/\w+(?=";){2}|(?<=\*)[\w_-]+(?=\*)/, 'g') );
+    for (let i = 0; i < tokens.length; i+=2) {
+        const element = tokens[i];
+
+        if (element.includes("andOr")) {
+            result.push([element, tokens[i+1]]);
+        }
+
+        if (element.includes("stepFunction")) {
+            result.push([element, tokens[i+1]]);
+        }
+
+        if (element.includes("field")) {
+            result.push([element, tokens[i+1]]);
+        }
+
+        if (element.includes("operator")) {
+            result.push([element, tokens[i+1]]);
+        }
+
+        if (element.includes("value")) {
+            result.push([element, tokens[i+1]]);
+        }
+
+        if (element.includes("varName")) {
+            result.push([element, tokens[i+1]]);
+        }
+
+        if (element.includes("eval")) {
+            result.push([element, tokens.slice(i+1)]);
+            i = tokens.length;
+        }
     }
-    // tokens[0] = tokens[0].split("{")[1];
-    // tokens.pop();
-
-    let i = 0;
-    while (i < tokens.length) {
-
-        if (tokens[i].includes("andOr")) {
-            result.push(tokens[i+1]);
-        }
-
-        if (tokens[i].includes("stepFunction")) {
-            result.push(tokens[i+1]);
-        }
-
-        if (tokens[i].includes("field")) {
-            result.push(tokens[i+1]);
-        }
-
-        if (tokens[i].includes("operator")) {
-            result.push(tokens[i+1]);
-        }
-
-        if (tokens[i].includes("value")) {
-            result.push(tokens[i+1]);
-        }
-
-        if (tokens[i].includes("varName")) {
-            result.push(tokens[i+1]);
-        }
-
-        if (tokens[i].includes("eval")) {   // broken. Read comment above function
-            let varEval = tempTokens[i+1].split(/\*[a-zA-z_-]+\*/g);
-            result.push(varEval);
-        }
-        
-        i+=2;
-    }
-
-    // "a:1:{s:12:"stepFunction";s:9:"waitDelay";}"
-    // "a:3:{s:5:"andOr";s:3:"and";s:12:"stepFunction";s:12:"fieldChanged";s:5:"field";s:9:"194969106";}"
-    // "a:5:{s:5:"andOr";s:3:"and";s:12:"stepFunction";s:15:"fieldValueMatch";s:5:"field";s:9:"194969106";s:8:"operator";s:2:"eq";s:5:"value";s:8:"Complete";}"
-    
 
     return result;
 }
