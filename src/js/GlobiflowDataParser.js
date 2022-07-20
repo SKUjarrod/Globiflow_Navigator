@@ -143,6 +143,20 @@ function GetNodeData(parent, elementName) {
     }
 }
 
+// make enum of all actions names and a function that maps stepFunctions from flow json into action names
+const actionNames = {
+    customPrep: "varName",
+
+}
+
+// get 
+function GetActionData(actionDetails, actionName) {
+    //(stepFunction) => {return stepDetails.find( (stepFunction,i) => {stepDetails[i+1]} )} // use step function in enum to determine what name type is. Then find name type e.g. VarName. When found name type then i+1 to get name type value
+    let enumResult = actionNames[actionName];
+    let flatArray = actionDetails.flat(2);
+    return flatArray[flatArray.indexOf(enumResult)+1];
+}
+
 // generate the GlobiflowDataStructure class for an object based on the parsed xml from a file
 function GenerateDataStructure(readData) {
 
@@ -165,6 +179,18 @@ function GenerateDataStructure(readData) {
     globalObjectsArray.push(object);
     objectAddBuffer.push(object);
 
+
+
+    // check if workspace exists or not here
+    // if it doesn't exists then create a new root tree
+    // if it does exists then add a new app onto it
+
+    // tree.insert()
+    // create tree node of datastructure here
+    // tree.insert(0, 1, "test");
+
+
+    
     return object;
     // Once flowDataStructure has been added to global arrays, create its app
 }
@@ -191,11 +217,6 @@ function Base64Decode(base64Encoded) {
     return result;
 }
 
-// make enum of all actions names and a function that maps stepFunctions from flow json into action names
-const actionNames = {
-    customPrep: "varName"
-}
-
 function ParseActions(ActionsXML) {
     let actions = [];
 
@@ -210,15 +231,14 @@ function ParseActions(ActionsXML) {
         let action;
 
         const step = ActionsXML._actions.childNodes[i];
-        // const stepData = 
         let stepType = GetNodeData(step, "stepType");
         let stepFunction = GetNodeData(step, "stepFunction");
         let stepDetails = ParseActionDetails( Base64Decode( GetNodeData(step, "stepDetails") ));
-        let stepName = GetActionData()
+        let stepName = GetActionData(stepDetails, stepFunction); 
         switch (stepType) {
             case "F":   // Filter
                 action = new Action({
-                    actionName: "",
+                    actionName: stepName,
                     stepID: i,
                     actionType: stepFunction,
                     actionDetails: stepDetails,
@@ -228,7 +248,7 @@ function ParseActions(ActionsXML) {
             
             case "A":   // Action
                 action = new Action({
-                    actionName: (stepFunction) => {return stepDetails.find( (stepFunction,i) => {stepDetails[i+1]} )},  // use step function in enum to determine what name type is. Then find name type e.g. VarName. When found name type then i+1 to get name type value
+                    actionName: stepName,  
                     stepID: i,
                     actionType: stepFunction,
                     actionDetails: stepDetails,

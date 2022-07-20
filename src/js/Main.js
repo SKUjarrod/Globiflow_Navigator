@@ -21,12 +21,17 @@ var two = new Two({
 ///// File Reader stuff //////
 //////////////////////////////
 
+// this is here temporaryly. eventually move this to somewhere that will generate a new tree everytime an app from a new workspace is imported
+var techTree = new Tree(0, "TechWorkspaceRootNode");
+
 //try read previous save file from saves folder
 ReadAppState();
 
 var fileInputElement = document.getElementById("fileInput");
 fileInputElement.addEventListener("change", () => {
     MultiFileReader(fileInputElement.files);
+
+    // all file reading complete
 
     // write the current app state to the saves file in the saves folder. Used so dont have to import everything every time you open the app
     WriteAppState();

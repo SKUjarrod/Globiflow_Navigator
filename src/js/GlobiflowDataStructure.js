@@ -23,8 +23,10 @@ let appID = ""
 let appName = "";
 
 let flowActions = []; // Array of Actions. Order matters
-let forwardConnections = [];
-let backwardConnections = [];
+
+// not sure if i need this variables yet
+// let forwardConnections = [];
+// let backwardConnections = [];
 
 class DataStructure {
     constructor(params) {
