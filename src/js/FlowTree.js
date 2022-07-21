@@ -21,12 +21,14 @@ class TreeNode {
     /**
      * 
      * @param {*} key is UID for tree node
+     * @param {*} type is type of tree node. Either (W)orkspace, (A)pp, (F)low
      * @param {*} value is datastructure object
      * @param {*} parent is parent tree node
      * @param {*} children is child tree nodes
      */
-    constructor (key, value = key, parent = null) {
+    constructor (key, type = null, value = key, parent = null) {
         this.key = key;
+        this.type = type;
         this.value = value;
         this.parent = parent;
         this.children = [];
@@ -39,35 +41,50 @@ class TreeNode {
     get hasChildren() {
         return !this.isLeaf;
     }
-}
 
-/**
- * Tree Action Node Class
- */
-class TreeActionNode {
-    /**
-     * 
-     * @param {*} key is UID for tree node
-     * @param {*} value is datastructure object
-     * @param {*} parent is parent tree node
-     * @param {*} actionChildren is child actions of a node. Are in another dimension, should not have children that are other tree nodes
-     */
-
-    constructor (key, value = key, parent = null) {
-        this.key = key;
-        this.value = value;
-        this.parent = parent;
-        this.actionChildren = [];
-    }
-
-    get isLeaf() {
-        return this.actionChildren.length === 0;
-    }
-
-    get hasChildren() {
-        return !this.isLeaf;
+    testValue(testValue) {
+      if (testValue == this.value) {
+        return true;
+      }
+      return false;
     }
 }
+
+// /**
+//  * Tree Action Node Class
+//  */
+// class TreeActionNode {
+//     /**
+//      * 
+//      * @param {*} key is UID for tree node
+//      * @param {*} value is datastructure object
+//      * @param {*} parent is parent tree node
+//      * @param {*} actionChildren is child actions of a node. Are in another dimension, should not have children that are other tree nodes
+//      */
+
+//     constructor (key, type = null, value = key, parent = null) {
+//         this.key = key;
+//         this.type = type;
+//         this.value = value;
+//         this.parent = parent;
+//         this.actionChildren = [];
+//     }
+
+//     get isLeaf() {
+//         return this.actionChildren.length === 0;
+//     }
+
+//     get hasChildren() {
+//         return !this.isLeaf;
+//     }
+
+//     testValue(testValue) {
+//       if (testValue == this.value) {
+//         return true;
+//       }
+//       return false;
+//     }
+// }
 
 /**
  * Tree class
@@ -76,39 +93,40 @@ class Tree {
     /**
      * 
      * @param {*} key is UID for root of tree
+     * @param {*} type is type of tree node. Either (W)orkspace, (A)pp, (F)low
      * @param {*} value is value for root of tree
      */
-    constructor(key, value = key) {
-        this.root = new TreeNode(key, value);
+    constructor(key, type = null, value = key) {
+        this.root = new TreeNode(key, type,value);
     }
 
     *preOrderTraversal(node = this.root) {
-        yield node;
-        if (node.children.length) {
-          for (let child of node.children) {
-            yield* this.preOrderTraversal(child);
-          }
+      yield node;
+      if (node.children.length) {
+        for (let child of node.children) {
+          yield* this.preOrderTraversal(child);
         }
       }
+    }
     
     *postOrderTraversal(node = this.root) {
-    if (node.children.length) {
-        for (let child of node.children) {
-        yield* this.postOrderTraversal(child);
-        }
-    }
-    yield node;
+      if (node.children.length) {
+          for (let child of node.children) {
+          yield* this.postOrderTraversal(child);
+          }
+      }
+      yield node;
     }
 
-    insert(parentNodeKey, key, value = key) {
-        for (let node of this.preOrderTraversal()) {
-          if (node.key === parentNodeKey) {
-            node.children.push(new TreeNode(key, value, node));
-            return true;
-          }
+    insert(parentNodeKey, key, type = null,  value = key) {
+      for (let node of this.preOrderTraversal()) {
+        if (node.key === parentNodeKey) {
+          node.children.push(new TreeNode(key, type, value, node));
+          return true;
         }
-        return false;
       }
+      return false;
+    }
     
       remove(key) {
         for (let node of this.preOrderTraversal()) {
@@ -121,10 +139,18 @@ class Tree {
         return false;
       }
     
-      find(key) {
+      find(key, type = null) {
         for (let node of this.preOrderTraversal()) {
-          if (node.key === key) return node;
+          if (node.key === key && node.type === type) return node;
         }
         return undefined;
       }
+}
+
+const TreeNodeTypes = {
+  R: "Root",
+  W: "Workspace",
+  A: "App",
+  F: "Flow",
+  Ac: "Action"
 }

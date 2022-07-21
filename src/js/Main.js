@@ -17,12 +17,11 @@ var two = new Two({
 //// HTML TopBar Stuff Here ////
 ////////////////////////////////
 
+var treeRoot = new Tree("Root", TreeNodeTypes.R, "TreeRoot");
+
 //////////////////////////////
 ///// File Reader stuff //////
 //////////////////////////////
-
-// this is here temporaryly. eventually move this to somewhere that will generate a new tree everytime an app from a new workspace is imported
-var techTree = new Tree(0, "TechWorkspaceRootNode");
 
 //try read previous save file from saves folder
 ReadAppState();
@@ -51,7 +50,7 @@ document.getElementById('workplaceSelect').addEventListener("change", (e) => {
 ////////////////////////////////////
 //// End HTML TopBar Stuff Here ////
 ////////////////////////////////////
-////////////////////////////////////////////////////////////
+////////////////////////////////////
 
 
 
@@ -64,10 +63,11 @@ var stage = new Two.Group();
 stage.id = "Stage Group";
 stage.uID = nextAvailableUID;
 nextAvailableUID++;
+
 var connections = new Two.Group();
 connections.id = "Connections Group";
 connections.uID = nextAvailableUID;
-nextAvailableUID
+nextAvailableUID++;
 
 let max = 1;//globalObjectsArray.length + 1; //currently used for creating connection lines
 

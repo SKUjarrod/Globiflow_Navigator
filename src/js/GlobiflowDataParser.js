@@ -76,8 +76,14 @@ function startXMLParse(fileName, XMLResult) {
     if (CheckFileCompatability(fileName, xmlDoc)) {
         data = ExtractDatafromXMLDOM(xmlDoc);
         
+        // check if workspace exists here. Create new root tree here if doesn't exist
+
+        if (!CheckWorkspaceExists(data._workSpace)) {
+            treeRoot.insert("Root", data._workSpace, TreeNodeTypes.W, data._workSpace);
+        }
+
         let flowData = GenerateDataStructure(data);
-        CalculateConnections(flowData.data);
+        // CalculateConnections(flowData.data);
 
         // CreateVisualElement(); // maybe move this to FileIO.js in the multi file reader function so it only runs once when all files have been read. Currently its not batching and running every file which isnt really batching
         filesParsed++;
@@ -176,21 +182,26 @@ function GenerateDataStructure(readData) {
     });
 
     let object = {object: undefined, data: dataStructure};
-    globalObjectsArray.push(object);
-    objectAddBuffer.push(object);
-
-
 
     // check if workspace exists or not here
     // if it doesn't exists then create a new root tree
     // if it does exists then add a new app onto it
 
-    // tree.insert()
-    // create tree node of datastructure here
-    // tree.insert(0, 1, "test");
+    // fix up the UID keys. Theres no structure to it and there are overlapping keys e.g. rootTree and flows
 
+    // check if a flow for an app has been imported yet
+    if (!CheckAppExists(readData._appID)) {
+        // app doesn't exist, create app and then flow under it
+        let node = treeRoot.find(readData._workSpace, TreeNodeTypes.W);
+        treeRoot.insert(node.key, readData._appID, TreeNodeTypes.A, readData._appName); // create app node
+    }
 
-    
+    let node = treeRoot.find(readData._appID, TreeNodeTypes.A)
+    treeRoot.insert(node.key, filesParsed, TreeNodeTypes.F, object); // create flow node
+
+    globalObjectsArray.push(object);
+    objectAddBuffer.push(object);
+
     return object;
     // Once flowDataStructure has been added to global arrays, create its app
 }
@@ -206,7 +217,14 @@ function GenerateDataStructure(readData) {
 function CalculateConnections(Flow) {
     for (let i = 0; i < Flow.flowActions.length; i++) {
         const element = Flow.flowActions[i];
+        switch (element.actionType) {
+            case "value":
+                
+                break;
         
+            default:
+                break;
+        }
     }
 }
 
@@ -276,7 +294,7 @@ function ParseActions(ActionsXML) {
 function ParseActionDetails(stepDetails) {
     let result = [];    
     let tokens = stepDetails.match( new RegExp(/\w+(?=";){2}|(?<=\*)[\w_-]+(?=\*)/, 'g') );
-    for (let i = 0; i < tokens.length; i+=2) {
+    for (let i = 0; i < tokens.length; i++) {
         const element = tokens[i];
 
         if (element.includes("andOr")) {
@@ -295,7 +313,7 @@ function ParseActionDetails(stepDetails) {
             result.push([element, tokens[i+1]]);
         }
 
-        if (element.includes("value")) {
+        if (element == ("value")) {
             result.push([element, tokens[i+1]]);
         }
 
@@ -307,6 +325,10 @@ function ParseActionDetails(stepDetails) {
             result.push([element, tokens.slice(i+1)]);
             i = tokens.length;
         }
+
+        if (element == ("values")) {
+            result.push([element, [tokens[i+1], tokens[i+2]]]);
+        }
     }
 
     return result;
@@ -317,12 +339,12 @@ function ParseActionDetails(stepDetails) {
 
 ///// this is all data oriented app stuff //////// dont know if all this is entirely nessessary. Maybe just the checkAppExists function should exist and modified to be less expensive, maybe search appArray instead of every objectArray
 
-// Checks if a workspace has been created already
+// Checks if a App has been created already
 function CheckAppExists(currentAppID) {
     for (let i = 0; i < globalObjectsArray.length; i++) {
-        const currentElementData = globalObjectsArray[i].object;
-        if (currentElementData != undefined) {
-            if (currentElementData.dataStructure.appID == currentAppID) {
+        const currentAppData = globalObjectsArray[i].data;
+        if (currentAppData != undefined) {
+            if (currentAppData.appID == currentAppID) {
                 return true;
             }
         }
@@ -330,19 +352,33 @@ function CheckAppExists(currentAppID) {
     return false;
 }
 
-// Adds a new Workspace from a DataStructure into the HTML content
-function AddNewApp(object) {
-    let appExists = CheckAppExists(object.appID);
-    let selectElement = document.getElementById('appSelect');
+// // Adds a new Workspace from a DataStructure into the HTML content
+// function AddNewApp(object) {
+//     let appExists = CheckAppExists(object.appID);
+//     let selectElement = document.getElementById('appSelect');
     
-    // equals false, create new app html elements
-    if (appExists == false) {
-        var option = document.createElement("option");
-        option.value = object.appName;
-        option.text = object.appName;
+//     // equals false, create new app html elements
+//     if (appExists == false) {
+//         var option = document.createElement("option");
+//         option.value = object.appName;
+//         option.text = object.appName;
 
-        selectElement.appendChild(option);
+//         selectElement.appendChild(option);
+//     }
+// }
+
+// Checks if a Workspace has already been created
+// This uses data to check. This is pre object creation
+function CheckWorkspaceExists(workspace) {
+    for (let i = 0; i < globalObjectsArray.length; i++) {
+        const currentWorkspaceData = globalObjectsArray[i].data;
+        if (currentWorkspaceData != undefined) {
+            if (currentWorkspaceData.workspace == workspace) {
+                return true;
+            }
+        }
     }
+    return false;
 }
 
 ///////////////////////////////////////////////////
