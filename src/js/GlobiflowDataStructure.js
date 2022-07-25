@@ -24,9 +24,11 @@ let appName = "";
 
 let flowActions = []; // Array of Actions. Order matters
 
-// not sure if i need this variables yet
-// let forwardConnections = [];
-// let backwardConnections = [];
+// not sure if i need this variables yet.
+// possible cache of connections
+// these are both unordered arrays
+let forwardConnections = [];
+let backwardConnections = [];
 
 class DataStructure {
     constructor(params) {
@@ -37,7 +39,7 @@ class DataStructure {
         this.selected = false;
         // this.position = {x: params.pos.x, y: params.pos.y};
         this.groupPositionOffset = {x: params.offset.x, y: params.offset.y};
-        this.workspace = params.workspace;
+        this.workSpace = params.workSpace;
         this.flowActions = params.flowActions
     }
 }

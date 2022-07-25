@@ -145,6 +145,18 @@ class Tree {
         }
         return undefined;
       }
+
+      /**
+       * @param {*} key is what being searched for
+       * @param {*} node is the node to start looking from
+       * @param {*} type is the type of node searching for
+       */
+      findIn(key, node, type) {
+        for (let fNode of this.preOrderTraversal(node)) {
+          if (fNode.key === key && fNode.type === type) return fNode;
+        }
+        return undefined;
+      }
 }
 
 const TreeNodeTypes = {
