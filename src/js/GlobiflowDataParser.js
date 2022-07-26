@@ -191,11 +191,11 @@ function GenerateDataStructure(readData) {
     }
 
     let node = treeRoot.find(readData._appID, TreeNodeTypes.A)
-    treeRoot.insert(node.key, filesParsed, TreeNodeTypes.F, object); // create flow node
+    treeRoot.insert(node.key, readData._flowName, TreeNodeTypes.F, object); // create flow node
 
     for (let i = 0; i < actions.length; i++) {
         const element = actions[i];
-        treeRoot.insert(filesParsed, i, TreeNodeTypes.Ac, element); // create action node
+        treeRoot.insert(readData._flowName, i, TreeNodeTypes.Ac, element); // create action node
     }
 
     globalObjectsArray.push(object);
@@ -236,7 +236,7 @@ function CalculateConnections(flow) {
 
                     // (todo) fix up the node id
                     let node = treeRoot.find(flow.appID, TreeNodeTypes.A)
-                    treeRoot.insert(node.key, filesParsed, TreeNodeTypes.F, undefined); // create empty flow node to import later
+                    treeRoot.insert(node.key, flow.flowName, TreeNodeTypes.F, undefined); // create empty flow node to import later
 
                     // // maybe dont need this as tree was just searched above
                     // // check if a flow for an app has been imported yet
