@@ -94,15 +94,27 @@ function CreateFlowDetails(group, currentObj) {
 
 // create all the connections between objects
 function CreateFlowConnectionArrow(currentObj) {
-    for (let j = 0; j < max; j++) {
-        let obj = globalObjectsArray[j].data;
-        let lineObj = two.makeLine(currentObj.groupPositionOffset.x, currentObj.groupPositionOffset.y, obj.groupPositionOffset.x, obj.groupPositionOffset.y);
-        lineObj.id = "Connection Line";
-        lineObj.uID = nextAvailableUID;
-        nextAvailableUID++;
-        // stage.add(lineObj);
-        connections.add(lineObj);
+    for (let i = 0; i < treeRoot.NodeCount; i++) {
+        let node = treeRoot.preOrderTraversal().next().value;
+        if (node.globiflowDataObject != undefined && node == "" /* node is a flow node, check if it has cached forward and backwards connections */) {
+            let lineObj = two.makeLine(currentObj.groupPositionOffset.x, currentObj.groupPositionOffset.y, node.groupPositionOffset.x, node.groupPositionOffset.y);
+            lineObj.id = "Connection Line";
+            lineObj.uID = nextAvailableUID;
+            nextAvailableUID++;
+            connections.add(lineObj);
+        }
     }
+
+
+    // for (let j = 0; j < max; j++) {
+    //     let obj = globalObjectsArray[j].data;
+    //     let lineObj = two.makeLine(currentObj.groupPositionOffset.x, currentObj.groupPositionOffset.y, obj.groupPositionOffset.x, obj.groupPositionOffset.y);
+    //     lineObj.id = "Connection Line";
+    //     lineObj.uID = nextAvailableUID;
+    //     nextAvailableUID++;
+    //     // stage.add(lineObj);
+    //     connections.add(lineObj);
+    // }
 }
 
 // selects the element by scaling element group and performing other functions to make it look like its selected. All purely visual

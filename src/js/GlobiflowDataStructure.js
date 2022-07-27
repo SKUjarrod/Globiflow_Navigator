@@ -1,9 +1,9 @@
-let flowName = "";
-// let flowID = "";
-let position = {x: 0, y: 0};
-// let childrenObjects = []; // this will hold actions the flow performs
-let groupPositionOffset = {x: 0, y: 0};
-let selected = false;
+// let flowName = "";
+// // let flowID = "";
+// let position = {x: 0, y: 0};
+// // let childrenObjects = []; // this will hold actions the flow performs
+// let groupPositionOffset = {x: 0, y: 0};
+// let selected = false;
 
 const workspaces = {
     Business_Development: 'Business Development',
@@ -27,13 +27,13 @@ let flowActions = []; // Array of Actions. Order matters
 // not sure if i need this variables yet.
 // possible cache of connections
 // these are both unordered arrays
-let forwardConnections = [];
-let backwardConnections = [];
+// let forwardConnections = [];    // forward connections are actual cached connections that will be used to draw connection lines
+// let backwardConnections = [];   // backwards connections are just back references to any flow that has a connection with this flow
 
 class DataStructure {
     constructor(params) {
         this.flowName = params.flowName;
-        // this.flowID = params.flowID;
+        this.flowID = params.flowID;
         this.appName = params.appName;
         this.appID = params.appID;
         this.selected = false;
@@ -41,5 +41,7 @@ class DataStructure {
         this.groupPositionOffset = {x: params.offset.x, y: params.offset.y};
         this.workSpace = params.workSpace;
         this.flowActions = params.flowActions
+        this.forwardConnections = params.forwardConnections;
+        this.backwardConnections = params.backwardConnections;
     }
 }

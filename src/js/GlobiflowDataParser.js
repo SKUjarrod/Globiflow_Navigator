@@ -74,7 +74,7 @@ function startXMLParse(fileName, XMLResult) {
     
     let data = {};
     if (CheckFileCompatability(fileName, xmlDoc)) {
-        data = ExtractDatafromXMLDOM(xmlDoc);
+        data = ExtractDatafromXMLDOM(xmlDoc, fileName);
         
         // check if workspace exists here. Create new root tree here if doesn't exist
 
@@ -92,7 +92,7 @@ function startXMLParse(fileName, XMLResult) {
 }
 
 // Extract Data from read XML Dom element to be used to generate data structure
-function ExtractDatafromXMLDOM(XMLDOM) {
+function ExtractDatafromXMLDOM(XMLDOM, fileName) {
     let data = {
         _flowName: '',
         _flowID: '',
@@ -108,6 +108,7 @@ function ExtractDatafromXMLDOM(XMLDOM) {
     let steps = GetNodeData(root, "steps");
 
     data._flowName = GetNodeData(flow, "flowName");
+    data._flowID = fileName.match(/\d+/)[0];
     data._description = GetNodeData(flow, "description");
     data._appID = GetNodeData(flow, "podioAppId");
     data._appName = GetNodeData(flow, "appName");
@@ -172,7 +173,7 @@ function GenerateDataStructure(readData) {
 
     var dataStructure = new DataStructure({
         flowName: readData._flowName,
-        // flowID: readData._flowID,
+        flowID: readData._flowID,
         offset:{x: appOffset.x, y: appOffset.y},
         description: readData._description,
         appID: readData._appID,
@@ -190,12 +191,21 @@ function GenerateDataStructure(readData) {
         treeRoot.insert(node.key, readData._appID, TreeNodeTypes.A, readData._appName); // create app node
     }
 
-    let node = treeRoot.find(readData._appID, TreeNodeTypes.A)
-    treeRoot.insert(node.key, readData._flowName, TreeNodeTypes.F, object); // create flow node
+    // (todo) update this so it starts search in workSpace. Can get workspace from readData
+    // Check if flow is undiscovered or is uninitalised and needs to be populated
+    let flowNode = treeRoot.findIn(readData._flowID, treeRoot.root, TreeNodeTypes.UF);
+    if (flowNode !== undefined) {
+        // node already exists but is uninitalised
+        flowNode.updateTreeNode(readData._flowID, TreeNodeTypes.F, object, flowNode.parent);
+    } else {
+        // node doesn't exist
+        let node = treeRoot.find(readData._appID, TreeNodeTypes.A)
+        treeRoot.insert(node.key, readData._flowID, TreeNodeTypes.F, object); // create flow node
+    }
 
     for (let i = 0; i < actions.length; i++) {
         const element = actions[i];
-        treeRoot.insert(readData._flowName, i, TreeNodeTypes.Ac, element); // create action node
+        treeRoot.insert(readData._flowID, i, TreeNodeTypes.Ac, element); // create action node
     }
 
     globalObjectsArray.push(object);
@@ -226,17 +236,17 @@ function CalculateConnections(flow) {
 
             case "triggerSelf":
                 let actionKey = element.actionDetails[1][1][1];
+                // update this so its not starting search in root
                 let treeSearchResult = treeRoot.findIn(actionKey, treeRoot.root, TreeNodeTypes.A);
                 if (treeSearchResult !== undefined) {
                     // search result found
-
 
                 } else {
                     // flow hasn't been imported yet or errored
 
                     // (todo) fix up the node id
                     let node = treeRoot.find(flow.appID, TreeNodeTypes.A)
-                    treeRoot.insert(node.key, flow.flowName, TreeNodeTypes.F, undefined); // create empty flow node to import later
+                    treeRoot.insert(node.key, actionKey, TreeNodeTypes.UF, undefined); // create empty flow node with temp actionKey key to import later
 
                     // // maybe dont need this as tree was just searched above
                     // // check if a flow for an app has been imported yet
@@ -250,6 +260,10 @@ function CalculateConnections(flow) {
 
                     // }
                 }
+
+                // maybe switch pushing the flow key to pushing the whole node object itself
+                flow.forwardConnections = Array.push(actionKey);
+
 
                 break
         
@@ -387,7 +401,7 @@ function CheckWorkspaceExists(workspace) {
     for (let i = 0; i < globalObjectsArray.length; i++) {
         const currentWorkspaceData = globalObjectsArray[i].data;
         if (currentWorkspaceData != undefined) {
-            if (currentWorkspaceData.workspace == workspace) {
+            if (currentWorkspaceData.workSpace == workspace) {
                 return true;
             }
         }

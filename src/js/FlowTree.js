@@ -4,22 +4,12 @@
 //
 // connection lines can use this tree to search flows for keywords and connect flows that match 
 
-/*
-
-                    ROOT NODE
-                        |
-
-
-
-*/
-
 
 /**
  * Tree Node Class
  */
 class TreeNode {
     /**
-     * 
      * @param {*} key is UID for tree node
      * @param {*} type is type of tree node. Either (W)orkspace, (A)pp, (F)low
      * @param {*} value is datastructure object
@@ -48,50 +38,22 @@ class TreeNode {
       }
       return false;
     }
+
+    updateTreeNode(key, type = null, value = key, parent = null) {
+      this.key = key;
+      this.type = type;
+      this.value = value;
+      this.parent = parent;
+  }
 }
 
-// /**
-//  * Tree Action Node Class
-//  */
-// class TreeActionNode {
-//     /**
-//      * 
-//      * @param {*} key is UID for tree node
-//      * @param {*} value is datastructure object
-//      * @param {*} parent is parent tree node
-//      * @param {*} actionChildren is child actions of a node. Are in another dimension, should not have children that are other tree nodes
-//      */
-
-//     constructor (key, type = null, value = key, parent = null) {
-//         this.key = key;
-//         this.type = type;
-//         this.value = value;
-//         this.parent = parent;
-//         this.actionChildren = [];
-//     }
-
-//     get isLeaf() {
-//         return this.actionChildren.length === 0;
-//     }
-
-//     get hasChildren() {
-//         return !this.isLeaf;
-//     }
-
-//     testValue(testValue) {
-//       if (testValue == this.value) {
-//         return true;
-//       }
-//       return false;
-//     }
-// }
 
 /**
  * Tree class
  */
 class Tree {
+  NodeCount = 0;
     /**
-     * 
      * @param {*} key is UID for root of tree
      * @param {*} type is type of tree node. Either (W)orkspace, (A)pp, (F)low
      * @param {*} value is value for root of tree
@@ -122,6 +84,7 @@ class Tree {
       for (let node of this.preOrderTraversal()) {
         if (node.key === parentNodeKey) {
           node.children.push(new TreeNode(key, type, value, node));
+          this.NodeCount++;
           return true;
         }
       }
@@ -133,6 +96,8 @@ class Tree {
           const filtered = node.children.filter(c => c.key !== key);
           if (filtered.length !== node.children.length) {
             node.children = filtered;
+            // only works if key is unique
+            this.NodeCount--;
             return true;
           }
         }
@@ -164,5 +129,6 @@ const TreeNodeTypes = {
   W: "Workspace",
   A: "App",
   F: "Flow",
+  UF: "Uninitalised Flow",
   Ac: "Action"
 }
