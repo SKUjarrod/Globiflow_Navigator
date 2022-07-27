@@ -179,7 +179,9 @@ function GenerateDataStructure(readData) {
         appID: readData._appID,
         appName: readData._appName,
         workSpace: readData._workSpace,
-        flowActions: actions
+        flowActions: actions,
+        forwardConnections: [],
+        backwardConnections: []
     });
 
     let object = {object: undefined, data: dataStructure};
@@ -262,7 +264,7 @@ function CalculateConnections(flow) {
                 }
 
                 // maybe switch pushing the flow key to pushing the whole node object itself
-                flow.forwardConnections = Array.push(actionKey);
+                flow.forwardConnections.push(actionKey);
 
 
                 break
