@@ -94,12 +94,13 @@ function CreateFlowDetails(group, currentObj) {
 
 // create all the connections between objects
 function CreateFlowConnectionArrow() {
-    // for (let i = 0; i < connections.children.length; i++) {
-    //     const element = connections.children[i];
-    //     connections.remove(element);
-    // }
-
-    // two.update();
+    for (let i = 0; i < connections.children.length; i++) {
+        const element = connections.children[i];
+        connections.remove(element);
+        element.remove();
+    }
+    
+    two.update();
     let nodes = [...treeRoot.preOrderTraversal()];
     for (let i = 0; i < nodes.length; i++) {
         if (nodes[i].type == TreeNodeTypes.F && nodes[i].value.data != undefined && nodes[i].value.data.forwardConnections.length > 0) {
@@ -339,13 +340,14 @@ function SelectApp(currentAppGroup) {
         currentAppGroup.matrix.scale(2, 2);
         FocusApp(currentAppGroup);
 
-        for (let i = 0; i < currentAppGroup.children.length; i++) {
-            const element = currentAppGroup.children[i];
-            if (element.id == "Flow Group") {
+        // for (let i = 0; i < currentAppGroup.children.length; i++) {
+        //     const element = currentAppGroup.children[i];
+        //     if (element.id == "Flow Group") {
 
-            }
+        //     }
             
-        }
+        // }
+        UpdateObjectGlobaltransform();
 
         currentlyOpenedAppGroup = currentAppGroup;
     }
@@ -401,13 +403,31 @@ function deFocusApp(appElem) {
     two.update();
 }
 
-// function CalculateObjectGlobaltransform(object) {
-//     while (false) {
+function UpdateObjectGlobaltransform() {
+    // needs to update every time a change happens that affects it
+    // set the data partion of the flow object to be the global transform of the object
+    two.update();
+    let nodes = [...treeRoot.preOrderTraversal()];
+    for (let i = 0; i < nodes.length; i++) {
+        if (nodes[i].type == TreeNodeTypes.F && nodes[i].value.data != undefined) {
+            // let globalTransformX = 0;
+            // let globalTransformY = 0;
+            let element = nodes[i].value.object;
+            let DOMRect = element.getBoundingClientRect();
+            // while (element.id !== "Stage Group") {
+            //     globalTransformX += element.position.x;
+            //     globalTransformY += element.position.y
+            //     element = element.parent
+            // }
+            
+            nodes[i].value.data.groupPositionOffset.x = DOMRect.left + (DOMRect.width / 2);
+            nodes[i].value.data.groupPositionOffset.y = DOMRect.top + (DOMRect.height / 2);;
 
-//     }
-
-//     return {X: "", Y: ""}
-// }
+            // nodes[i].value.data.groupPositionOffset.x = globalTransformX;
+            // nodes[i].value.data.groupPositionOffset.y = globalTransformY;
+        }
+    }  
+}
 
 
 

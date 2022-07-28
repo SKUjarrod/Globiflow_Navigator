@@ -105,6 +105,8 @@ two.add(connections);
 addZUI();
 two.update();
 
+
+// to test element positions
 domElement.addEventListener('mousemove', event =>
 {
     let bound = domElement.getBoundingClientRect();

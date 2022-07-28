@@ -7,11 +7,14 @@
 
 * TODO LIST 
 
-fix the element offsets not updating
+fix the element offsets not updating. Just use GgetBoundingClientRect() function.
+https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect
+
 
 create tree structure for flows
 
 fix slight offset of flows when opening and closing apps. In Object_Functions.js. Bus is with the scaling of the groups from the anchor which is top left i believe
+
 
 
 look at possible Globiflow API integration * not possible using Current API*
