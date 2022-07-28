@@ -20,8 +20,9 @@ function MakeFlow(currentObj) {
     CreateFlow(group, currentObj);
     CreateFlowDetails(group, currentObj);
 
-    // connections aren't part of element group
-    CreateFlowConnectionArrow(currentObj);
+    // moved this to main. keep this just in case to revert back to original call pos
+    // // connections aren't part of element group
+    // CreateFlowConnectionArrow(currentObj);
     return group;
 }
 
@@ -84,7 +85,6 @@ function CreateFlowDetails(group, currentObj) {
     // testTextObject.size = 10;
     // detailArray.push(testTextObject);
 
-
     // loop through all detailArray items and add them to group
     for (let index = 0; index < detailArray.length; index++) {
         const detail = detailArray[index];
@@ -93,15 +93,38 @@ function CreateFlowDetails(group, currentObj) {
 }
 
 // create all the connections between objects
-function CreateFlowConnectionArrow(currentObj) {
-    for (let i = 0; i < treeRoot.NodeCount; i++) {
-        let node = treeRoot.preOrderTraversal().next().value;
-        if (node.globiflowDataObject != undefined && node == "" /* node is a flow node, check if it has cached forward and backwards connections */) {
-            let lineObj = two.makeLine(currentObj.groupPositionOffset.x, currentObj.groupPositionOffset.y, node.groupPositionOffset.x, node.groupPositionOffset.y);
-            lineObj.id = "Connection Line";
-            lineObj.uID = nextAvailableUID;
-            nextAvailableUID++;
-            connections.add(lineObj);
+function CreateFlowConnectionArrow() {
+    // for (let i = 0; i < connections.children.length; i++) {
+    //     const element = connections.children[i];
+    //     connections.remove(element);
+    // }
+
+    // two.update();
+    let nodes = [...treeRoot.preOrderTraversal()];
+    for (let i = 0; i < nodes.length; i++) {
+        if (nodes[i].type == TreeNodeTypes.F && nodes[i].value.data != undefined && nodes[i].value.data.forwardConnections.length > 0) {
+            
+            for (let j = 0; j < nodes[i].value.data.forwardConnections.length; j++) {
+                const connection = nodes[i].value.data.forwardConnections[j];
+                if (connection.type != TreeNodeTypes.UF) { /* dont know if need to check that the connection ref isn't itself */   
+                    // let globalTransformX = 0;
+                    // let globalTransformY = 0;
+                    // let element = connection.value.object;
+                    // while (element.id !== "Stage Group") {
+                    //     globalTransformX += element.position.x;
+                    //     globalTransformY += element.position.y
+                    //     element = element.parent
+                    // }
+                    // nodes[i].value.data.groupPositionOffset.x = globalTransformX;
+                    // nodes[i].value.data.groupPositionOffset.y = globalTransformY;
+                    
+                    let lineObj = two.makeLine(connection.value.data.groupPositionOffset.x, connection.value.data.groupPositionOffset.y, nodes[i].value.data.groupPositionOffset.x, nodes[i].value.data.groupPositionOffset.y);
+                    lineObj.id = "Connection Line";
+                    lineObj.uID = nextAvailableUID;
+                    nextAvailableUID++;
+                    connections.add(lineObj);
+                }
+            }
         }
     }
 
@@ -316,6 +339,14 @@ function SelectApp(currentAppGroup) {
         currentAppGroup.matrix.scale(2, 2);
         FocusApp(currentAppGroup);
 
+        for (let i = 0; i < currentAppGroup.children.length; i++) {
+            const element = currentAppGroup.children[i];
+            if (element.id == "Flow Group") {
+
+            }
+            
+        }
+
         currentlyOpenedAppGroup = currentAppGroup;
     }
 
@@ -364,12 +395,19 @@ function deFocusApp(appElem) {
             if (element.dataStructure.selected) {
                 CloseFlow(element, element.dataStructure);
             }
-            element.visible = false;
+            // element.visible = false;
         }
     }
     two.update();
 }
 
+// function CalculateObjectGlobaltransform(object) {
+//     while (false) {
+
+//     }
+
+//     return {X: "", Y: ""}
+// }
 
 
 

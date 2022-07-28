@@ -69,7 +69,7 @@ connections.id = "Connections Group";
 connections.uID = nextAvailableUID;
 nextAvailableUID++;
 
-let max = 1;//globalObjectsArray.length + 1; //currently used for creating connection lines
+// let max = 1;//globalObjectsArray.length + 1; //currently used for creating connection lines
 
 
 // add data object as attribute to flow group object.
@@ -94,10 +94,25 @@ function CreateVisualElement() {
         AddFlowGroupToBeCalculated(group);
     }
     CalculateFlowInAppOffset(appGroup);
+
+    // connections aren't part of element group
+    CreateFlowConnectionArrow();
 }
 
-
-two.add(connections);
+// this order matters. determines draw layers
 two.add(stage);
+two.add(connections);
 addZUI();
 two.update();
+
+domElement.addEventListener('mousemove', event =>
+{
+    let bound = domElement.getBoundingClientRect();
+
+    let x = event.clientX - bound.left - domElement.clientLeft;
+    let y = event.clientY - bound.top - domElement.clientTop;
+
+    console.warn("X: " + x);
+    console.warn("Y: " + y);
+    // context.fillRect(x, y, 16, 16);
+});

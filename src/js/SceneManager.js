@@ -11,7 +11,8 @@ function CalculateAppOffsets(AppGroup) {
     
     // calculate offsets from centre point here
     // DisparseAlgorithm(1);
-    return {x: Math.random()*1000, y: Math.random()*1000};
+    return {x: 300, y: 300};
+    // return {x: Math.random()*200, y: Math.random()*200};
 }
 
 
@@ -84,8 +85,28 @@ function CalculateFlowInAppOffset() {
             SetFlowOffsets(flows[flow], X, Y);
         }
     }
-        
+    
     appsToBeCalculated = [];
+
+    // move this to its own function. Also take into account scaling of apps and flows
+    // needs to update every time a change happens that affects it
+    // set the data partion of the flow object to be the global transform of the object
+    two.update();
+    let nodes = [...treeRoot.preOrderTraversal()];
+    for (let i = 0; i < nodes.length; i++) {
+        if (nodes[i].type == TreeNodeTypes.F && nodes[i].value.data != undefined) {
+            let globalTransformX = 0;
+            let globalTransformY = 0;
+            let element = nodes[i].value.object;
+            while (element.id !== "Stage Group") {
+                globalTransformX += element.position.x;
+                globalTransformY += element.position.y
+                element = element.parent
+            }
+            nodes[i].value.data.groupPositionOffset.x = globalTransformX;
+            nodes[i].value.data.groupPositionOffset.y = globalTransformY;
+        }
+    }  
 }
 
 // adds a flows parent (App Group) to the array of apps that need to be recalculated

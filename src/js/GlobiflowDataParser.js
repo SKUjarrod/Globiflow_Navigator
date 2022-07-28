@@ -243,6 +243,7 @@ function CalculateConnections(flow) {
                 if (treeSearchResult !== undefined) {
                     // search result found
 
+                    // flow.forwardConnections.push(treeRoot.findIn(actionKey, treeRoot.root, TreeNodeTypes.F));
                 } else {
                     // flow hasn't been imported yet or errored
 
@@ -250,21 +251,11 @@ function CalculateConnections(flow) {
                     let node = treeRoot.find(flow.appID, TreeNodeTypes.A)
                     treeRoot.insert(node.key, actionKey, TreeNodeTypes.UF, undefined); // create empty flow node with temp actionKey key to import later
 
-                    // // maybe dont need this as tree was just searched above
-                    // // check if a flow for an app has been imported yet
-                    // if (!CheckAppExists(flow.appID)) {
-                    //     // app doesn't exist, create app node for data to be imported later
-                    //     let node = treeRoot.find(flow.workSpace, TreeNodeTypes.W);
-                    //     treeRoot.insert(node.key, actionKey, TreeNodeTypes.A, flow.appName); // create app node
-                    // } else {
-                    //     // search result error
-                    //     console.error("Calculating Connection Tree Search Failed\n Trace: "+console.trace(treeSearchResult));
-
-                    // }
+                    // fix this to be start in node.key
+                    flow.forwardConnections.push(treeRoot.findIn(actionKey, treeRoot.root, TreeNodeTypes.UF));
                 }
 
                 // maybe switch pushing the flow key to pushing the whole node object itself
-                flow.forwardConnections.push(actionKey);
 
 
                 break
