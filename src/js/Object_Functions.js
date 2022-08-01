@@ -108,17 +108,7 @@ function CreateFlowConnectionArrow() {
             for (let j = 0; j < nodes[i].value.data.forwardConnections.length; j++) {
                 const connection = nodes[i].value.data.forwardConnections[j];
                 if (connection.type != TreeNodeTypes.UF) { /* dont know if need to check that the connection ref isn't itself */   
-                    // let globalTransformX = 0;
-                    // let globalTransformY = 0;
-                    // let element = connection.value.object;
-                    // while (element.id !== "Stage Group") {
-                    //     globalTransformX += element.position.x;
-                    //     globalTransformY += element.position.y
-                    //     element = element.parent
-                    // }
-                    // nodes[i].value.data.groupPositionOffset.x = globalTransformX;
-                    // nodes[i].value.data.groupPositionOffset.y = globalTransformY;
-                    
+
                     let lineObj = two.makeLine(connection.value.data.groupPositionOffset.x, connection.value.data.groupPositionOffset.y, nodes[i].value.data.groupPositionOffset.x, nodes[i].value.data.groupPositionOffset.y);
                     lineObj.id = "Connection Line";
                     lineObj.uID = nextAvailableUID;
@@ -128,17 +118,7 @@ function CreateFlowConnectionArrow() {
             }
         }
     }
-
-
-    // for (let j = 0; j < max; j++) {
-    //     let obj = globalObjectsArray[j].data;
-    //     let lineObj = two.makeLine(currentObj.groupPositionOffset.x, currentObj.groupPositionOffset.y, obj.groupPositionOffset.x, obj.groupPositionOffset.y);
-    //     lineObj.id = "Connection Line";
-    //     lineObj.uID = nextAvailableUID;
-    //     nextAvailableUID++;
-    //     // stage.add(lineObj);
-    //     connections.add(lineObj);
-    // }
+    two.update();
 }
 
 // selects the element by scaling element group and performing other functions to make it look like its selected. All purely visual
@@ -359,7 +339,10 @@ function SelectApp(currentAppGroup) {
         deFocusApp(currentAppGroup);
 
         currentlyOpenedAppGroup = undefined;
+        UpdateObjectGlobaltransform();
     }
+
+    CreateFlowConnectionArrow();
 }
 
 let originalAppOrderIndex = 0;
@@ -472,7 +455,7 @@ function addZUI() {
         if (!e.altKey) {
             var dy = (e.wheelDeltaY || - e.deltaY) / 1000;
             zuiStage.zoomBy(dy, e.clientX, e.clientY);
-            zuiConnections.zoomBy(dy, e.clientX, e.clientY);
+            // zuiConnections.zoomBy(dy, e.clientX, e.clientY);
         }
     }
   }
