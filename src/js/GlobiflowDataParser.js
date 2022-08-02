@@ -219,11 +219,6 @@ function GenerateDataStructure(readData) {
 
 // calculate the connections to and from a given flow for the GlobiflowDataStructure class for the flow object.
 // this is to calculate where to draw lines
-
-// will have to search for key actions that use other flows e.g. triggerFlow action. go through every flow already created and find the flow that the action triggers, if it exists link it to the current
-//  flow's connections through dataStructure class.
-//  If it doesn't exists then create a placeholder dataStructure as it may not have been imported yet.
-//  placeholder dataStructure must be created in a way that when it is imported, it must be able to link to that and just import data into dataStructure and not create a new object!
 function CalculateConnections(flow) {
     for (let i = 0; i < flow.flowActions.length; i++) {
         const element = flow.flowActions[i];
@@ -236,28 +231,47 @@ function CalculateConnections(flow) {
             
                 break;
 
+            case "getReferenced":
+                // let 
+                // let actionKey = element.actionDetails[1][1][1];
+                // // update this so its not starting search in root
+                // let treeSearchResult = treeRoot.findIn(actionKey, treeRoot.root, TreeNodeTypes.F);
+                // if (treeSearchResult !== undefined) {
+                //     // search result found
+
+                //     // flow.forwardConnections.push(treeRoot.findIn(actionKey, treeRoot.root, TreeNodeTypes.F));
+                //     flow.forwardConnections.push(treeSearchResult);
+                // } else {
+                //     // flow hasn't been imported yet or errored
+
+                //     let node = treeRoot.find(flow.appID, TreeNodeTypes.A)
+                //     treeRoot.insert(node.key, actionKey, TreeNodeTypes.UF, undefined); // create empty flow node with temp actionKey key to import later
+
+                //     // fix this to be start in node.key
+                //     flow.forwardConnections.push(treeRoot.findIn(actionKey, treeRoot.root, TreeNodeTypes.UF));
+                // }
+
+
+                break
+
             case "triggerSelf":
                 let actionKey = element.actionDetails[1][1][1];
                 // update this so its not starting search in root
-                let treeSearchResult = treeRoot.findIn(actionKey, treeRoot.root, TreeNodeTypes.A);
+                let treeSearchResult = treeRoot.findIn(actionKey, treeRoot.root, TreeNodeTypes.F);
                 if (treeSearchResult !== undefined) {
                     // search result found
 
                     // flow.forwardConnections.push(treeRoot.findIn(actionKey, treeRoot.root, TreeNodeTypes.F));
+                    flow.forwardConnections.push(treeSearchResult);
                 } else {
                     // flow hasn't been imported yet or errored
 
-                    // (todo) fix up the node id
                     let node = treeRoot.find(flow.appID, TreeNodeTypes.A)
                     treeRoot.insert(node.key, actionKey, TreeNodeTypes.UF, undefined); // create empty flow node with temp actionKey key to import later
 
                     // fix this to be start in node.key
                     flow.forwardConnections.push(treeRoot.findIn(actionKey, treeRoot.root, TreeNodeTypes.UF));
                 }
-
-                // maybe switch pushing the flow key to pushing the whole node object itself
-
-
                 break
         
             default:
@@ -327,11 +341,13 @@ function ParseActions(ActionsXML) {
     return actions;
 }
 
-// this function parses Action details into something readable
+// this function parses Action details into something readable and in a format for the connection calculator to do something with
 // takes in decoded base64 and returns array of details about step (Maybe, not sure of return format yet)
 function ParseActionDetails(stepDetails) {
     let result = [];    
-    let tokens = stepDetails.match( new RegExp(/\w+(?=";){2}|(?<=\*)[\w_-]+(?=\*)/, 'g') );
+    let tokens = stepDetails.match(/{.+}/g);
+    tokens = tokens.flat().toString().match( new RegExp(/{|\w+(?=";){2}|(?<=\*)[\w_-]+(?=\*)|}/, 'g') );
+
     for (let i = 0; i < tokens.length; i++) {
         const element = tokens[i];
 
@@ -365,7 +381,27 @@ function ParseActionDetails(stepDetails) {
         }
 
         if (element == ("values")) {
-            result.push([element, [tokens[i+1], tokens[i+2]]]);
+            // recurse into substring of values indicated by pair of "{" & "}", add recursion into result
+            // once finished recursion, remove the whole substring from tokens so it doesn't loop over recursed values
+
+            let j = i+2;
+            let bracketGroup = "{";
+            while (tokens[j] !== "}") {
+                bracketGroup += '"'+tokens[j]+'";';
+                j++;
+            }
+            bracketGroup+="}";
+
+            result.push([element, ParseActionDetails(bracketGroup)]);
+            tokens.splice(i+1, j-i);
+        }
+
+        if (element == "flow") {
+            result.push(element, tokens[i+1]);
+        }
+
+        if (element.includes("app_")) {
+            result.push(element, tokens[i+1]);
         }
     }
 

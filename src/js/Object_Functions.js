@@ -33,7 +33,7 @@ function CreateFlow(group, currentObj) {
     rect.uID = nextAvailableUID;
     nextAvailableUID++;
     two.update();
-    group._renderer.elem.addEventListener('click', (e) => {two.update(); selectFlow(group);}, false);
+    group._renderer.elem.addEventListener('click', (e) => {two.update(); selectFlow(group, e);}, false);
     group.add(rect);
 
     // stage.add(rect);
@@ -122,38 +122,41 @@ function CreateFlowConnectionArrow() {
 }
 
 // selects the element by scaling element group and performing other functions to make it look like its selected. All purely visual
-function selectFlow(selectedGroup) {
-    let operationDone = false;
-    // let foundGroup = globalObjectsArray.find( ({ object }) => object === selectedGroup); // super inefficent, especially at larger search volumes. change this by reading groups dataStructure property   
+function selectFlow(selectedGroup, e) {
 
-    // close Elements
-    if (currentlyOpenedGroup != undefined) { 
-        if (currentlyOpenedGroup != selectedGroup) {
-            CloseFlow(currentlyOpenedGroup, selectedGroup.dataStructure);
-        }
-        // maybe put below condition in an else from above condition
-        if (selectedGroup.dataStructure.selected == true && operationDone != true) {
-            CloseFlow(selectedGroup, selectedGroup.dataStructure);
-            operationDone = true;
-        }
-    }
+    if (!e.altKey) {
+        let operationDone = false;
+        // let foundGroup = globalObjectsArray.find( ({ object }) => object === selectedGroup); // super inefficent, especially at larger search volumes. change this by reading groups dataStructure property   
 
-    // open Elements
-    if (currentlyOpenedGroup == undefined) {
-        if (selectedGroup.dataStructure.selected != true && operationDone != true) {
-            Openflow(selectedGroup, selectedGroup.dataStructure);
-            operationDone = true;
+        // close Elements
+        if (currentlyOpenedGroup != undefined) { 
+            if (currentlyOpenedGroup != selectedGroup) {
+                CloseFlow(currentlyOpenedGroup, selectedGroup.dataStructure);
+            }
+            // maybe put below condition in an else from above condition
+            if (selectedGroup.dataStructure.selected == true && operationDone != true) {
+                CloseFlow(selectedGroup, selectedGroup.dataStructure);
+                operationDone = true;
+            }
         }
-    }
 
-    // opens boxes. params: selectedGroup, foundGroup
-    function Openflow(boxElem) {
-        boxElem.children[0].matrix.manual = true;
-        boxElem.children[0].matrix.scale(2, 4);
-        boxElem.dataStructure.selected = true;
-        FocusFlow(boxElem);
-    
-        currentlyOpenedGroup = boxElem;
+        // open Elements
+        if (currentlyOpenedGroup == undefined) {
+            if (selectedGroup.dataStructure.selected != true && operationDone != true) {
+                Openflow(selectedGroup, selectedGroup.dataStructure);
+                operationDone = true;
+            }
+        }
+
+        // opens boxes. params: selectedGroup, foundGroup
+        function Openflow(boxElem) {
+            boxElem.children[0].matrix.manual = true;
+            boxElem.children[0].matrix.scale(2, 4);
+            boxElem.dataStructure.selected = true;
+            FocusFlow(boxElem);
+        
+            currentlyOpenedGroup = boxElem;
+        }
     }
 }
 
@@ -270,7 +273,7 @@ function CreateAppElement(group, currentObjData) {
     
     // rect.verticies
     two.update();
-    rect._renderer.elem.addEventListener('click', (e) => {two.update(); SelectApp(group);}, false);
+    rect._renderer.elem.addEventListener('click', (e) => {two.update(); SelectApp(group, e);}, false);
     group.add(rect);
 }
 
@@ -286,63 +289,66 @@ function CreateAppDetails(group, currentObjData) {
 }
 
 // App Nodes will be square and when clicked on will morph into a big circle
-function SelectApp(currentAppGroup) {
-    // console.log("Group Selected!");
+function SelectApp(currentAppGroup, e) {
 
-    let operationDone = false;
-    // let foundGroup = globalObjectsArray.find( ({ object }) => object === selectedGroup); // super inefficent, especially at larger search volumes    
+    if (!e.altKey) {
+        // console.log("Group Selected!");
 
-    // close Elements
-    if (currentlyOpenedAppGroup != undefined) { 
-        if (currentlyOpenedAppGroup != currentAppGroup) {
-            // CloseBox(currentlyOpenedAppGroup, foundGroup);
-            CloseApp(currentlyOpenedAppGroup);
-        } else {
+        let operationDone = false;
+        // let foundGroup = globalObjectsArray.find( ({ object }) => object === selectedGroup); // super inefficent, especially at larger search volumes    
+
+        // close Elements
+        if (currentlyOpenedAppGroup != undefined) { 
+            if (currentlyOpenedAppGroup != currentAppGroup) {
+                // CloseBox(currentlyOpenedAppGroup, foundGroup);
+                CloseApp(currentlyOpenedAppGroup);
+            } else {
+                if (operationDone != true) {
+                    // CloseBox(selectedGroup, foundGroup);
+                    CloseApp(currentAppGroup);
+                    operationDone = true;
+                }
+            }
+        }
+
+        // open Elements
+        if (currentlyOpenedAppGroup == undefined) {
             if (operationDone != true) {
-                // CloseBox(selectedGroup, foundGroup);
-                CloseApp(currentAppGroup);
+                // OpenBox(selectedGroup, foundGroup);
+                OpenApp(currentAppGroup);
                 operationDone = true;
             }
         }
-    }
 
-    // open Elements
-    if (currentlyOpenedAppGroup == undefined) {
-        if (operationDone != true) {
-            // OpenBox(selectedGroup, foundGroup);
-            OpenApp(currentAppGroup);
-            operationDone = true;
+        function OpenApp(currentAppGroup) {
+            currentAppGroup.matrix.manual = true;
+            currentAppGroup.matrix.scale(2, 2);
+            FocusApp(currentAppGroup);
+
+            // for (let i = 0; i < currentAppGroup.children.length; i++) {
+            //     const element = currentAppGroup.children[i];
+            //     if (element.id == "Flow Group") {
+
+            //     }
+                
+            // }
+            UpdateObjectGlobaltransform();
+
+            currentlyOpenedAppGroup = currentAppGroup;
         }
+
+        function CloseApp(currentAppGroup) {
+            currentAppGroup.matrix.scale(0.5, 0.5);
+            two.update();
+            currentAppGroup.matrix.manual = false;
+            deFocusApp(currentAppGroup);
+
+            currentlyOpenedAppGroup = undefined;
+            UpdateObjectGlobaltransform();
+        }
+
+        CreateFlowConnectionArrow();
     }
-
-    function OpenApp(currentAppGroup) {
-        currentAppGroup.matrix.manual = true;
-        currentAppGroup.matrix.scale(2, 2);
-        FocusApp(currentAppGroup);
-
-        // for (let i = 0; i < currentAppGroup.children.length; i++) {
-        //     const element = currentAppGroup.children[i];
-        //     if (element.id == "Flow Group") {
-
-        //     }
-            
-        // }
-        UpdateObjectGlobaltransform();
-
-        currentlyOpenedAppGroup = currentAppGroup;
-    }
-
-    function CloseApp(currentAppGroup) {
-        currentAppGroup.matrix.scale(0.5, 0.5);
-        two.update();
-        currentAppGroup.matrix.manual = false;
-        deFocusApp(currentAppGroup);
-
-        currentlyOpenedAppGroup = undefined;
-        UpdateObjectGlobaltransform();
-    }
-
-    CreateFlowConnectionArrow();
 }
 
 let originalAppOrderIndex = 0;
@@ -386,28 +392,18 @@ function deFocusApp(appElem) {
     two.update();
 }
 
+// (todo) fix issue with scaling. Might have to do some matrix calculations
+// set the data partion of the flow object to be the global transform of the object
 function UpdateObjectGlobaltransform() {
-    // needs to update every time a change happens that affects it
-    // set the data partion of the flow object to be the global transform of the object
     two.update();
     let nodes = [...treeRoot.preOrderTraversal()];
     for (let i = 0; i < nodes.length; i++) {
         if (nodes[i].type == TreeNodeTypes.F && nodes[i].value.data != undefined) {
-            // let globalTransformX = 0;
-            // let globalTransformY = 0;
             let element = nodes[i].value.object;
             let DOMRect = element.getBoundingClientRect();
-            // while (element.id !== "Stage Group") {
-            //     globalTransformX += element.position.x;
-            //     globalTransformY += element.position.y
-            //     element = element.parent
-            // }
-            
-            nodes[i].value.data.groupPositionOffset.x = DOMRect.left + (DOMRect.width / 2);
-            nodes[i].value.data.groupPositionOffset.y = DOMRect.top + (DOMRect.height / 2);;
 
-            // nodes[i].value.data.groupPositionOffset.x = globalTransformX;
-            // nodes[i].value.data.groupPositionOffset.y = globalTransformY;
+            nodes[i].value.data.groupPositionOffset.x = ((DOMRect.left + (DOMRect.width / 2)) - zuiStage.surfaceMatrix.elements[2]) * zuiStage.surfaceMatrix.elements[0];
+            nodes[i].value.data.groupPositionOffset.y = ((DOMRect.top + (DOMRect.height / 2)) - zuiStage.surfaceMatrix.elements[5]) * zuiStage.surfaceMatrix.elements[4] ;
         }
     }  
 }
@@ -417,8 +413,8 @@ function UpdateObjectGlobaltransform() {
 // dont know if ZUI needs a uID, not sure if it creates a physical element in the DOM
 // ZUI is all the zoom and pan functionality
 function addZUI() {
-    var zuiStage = new Two.ZUI(stage); // forground elements
-    var zuiConnections = new Two.ZUI(connections); // background line connection elements
+    // var zuiStage = new Two.ZUI(stage); // forground elements
+    // var zuiConnections = new Two.ZUI(connections); // background line connection elements
     var mouse = new Two.Vector();
   
     zuiStage.addLimits(0.06, 8);
@@ -455,7 +451,7 @@ function addZUI() {
         if (!e.altKey) {
             var dy = (e.wheelDeltaY || - e.deltaY) / 1000;
             zuiStage.zoomBy(dy, e.clientX, e.clientY);
-            // zuiConnections.zoomBy(dy, e.clientX, e.clientY);
+            zuiConnections.zoomBy(dy, e.clientX, e.clientY);
         }
     }
   }

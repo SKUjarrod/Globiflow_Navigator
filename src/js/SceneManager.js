@@ -11,8 +11,8 @@ function CalculateAppOffsets(AppGroup) {
     
     // calculate offsets from centre point here
     // DisparseAlgorithm(1);
-    // return {x: 300, y: 300};
-    return {x: Math.random()*1000, y: Math.random()*1000};
+    return {x: 815, y: 385};
+    // return {x: Math.random()*1000, y: Math.random()*1000};
 }
 
 

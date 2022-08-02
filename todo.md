@@ -7,22 +7,16 @@
 
 * TODO LIST 
 
-fix the element offsets not updating. Just use GgetBoundingClientRect() function.
-https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect
+fix connection line scaling issue and drift.
 
 need to change way flowConnection lines are drawn. Change it so it only updates apps and flows that were modified in the frame e.g. position, scale...  Currently it updates every connection line
-
-fix connection line drift. i think this is being caused when the position of flows are updated and then moved and the the line position is recalculated is calculated in its global position not the offset of the new flow position from its old. 
-
 
 create tree structure for flows
 
 fix slight offset of flows when opening and closing apps. In Object_Functions.js. Bus is with the scaling of the groups from the anchor which is top left i believe
 
+calculating action details doesnt work for email actions yet
 
-
-look at possible Globiflow API integration * not possible using Current API*
-move html, css and js to be called from index.php
 
 create view for focused elements
 

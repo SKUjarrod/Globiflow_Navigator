@@ -69,6 +69,10 @@ connections.id = "Connections Group";
 connections.uID = nextAvailableUID;
 nextAvailableUID++;
 
+var zuiStage = new Two.ZUI(stage); // forground elements
+var zuiConnections = new Two.ZUI(connections); // background line connection elements
+
+
 // let max = 1;//globalObjectsArray.length + 1; //currently used for creating connection lines
 
 

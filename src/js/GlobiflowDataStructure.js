@@ -18,18 +18,28 @@ const workspaces = {
     Default: 'Error: Workplace'
 };
 
-let workspace = workspaces.Default;
-let appID = ""
-let appName = "";
 
-let flowActions = []; // Array of Actions. Order matters
+/**
+ * 
+ * @param params this is the parameter object with all parameters in it for contructor
+ * 
+ *  
+ *  workspace = workspaces.Default;
+ *  let appID = ""
+ *  let appName = "";
+ * 
+ *  let flowActions = []; // Array of Actions. Order matters
+ * 
+ *
 
 // not sure if i need this variables yet.
 // possible cache of connections
 // these are both unordered arrays
+// connections should be treeNodes
 // let forwardConnections = [];    // forward connections are actual cached connections that will be used to draw connection lines
 // let backwardConnections = [];   // backwards connections are just back references to any flow that has a connection with this flow
 
+ */
 class DataStructure {
     constructor(params) {
         this.flowName = params.flowName;
@@ -37,7 +47,6 @@ class DataStructure {
         this.appName = params.appName;
         this.appID = params.appID;
         this.selected = false;
-        // this.position = {x: params.pos.x, y: params.pos.y};
         this.groupPositionOffset = {x: params.offset.x, y: params.offset.y};
         this.workSpace = params.workSpace;
         this.flowActions = params.flowActions
