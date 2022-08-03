@@ -38,12 +38,14 @@ const workspaces = {
 // let backwardConnections = [];   // backwards connections are just back references to any flow that has a connection with this flow
 
  */
-class DataStructure {
+class FlowDataStructure {
     constructor(params) {
         this.flowName = params.flowName;
         this.flowID = params.flowID;
         this.appName = params.appName;
         this.appID = params.appID;
+        this.appDataStructure = params.appDataStructure;
+        this.description = params.description;
         this.selected = false;
         this.groupPositionOffset = {x: params.offset.x, y: params.offset.y};
         this.workSpace = params.workSpace;
@@ -58,11 +60,10 @@ class DataStructure {
     }
 }
 
-
 class AppDataStructure {
     constructor(params) {
         this.appName = params.appName;
         this.appID = params.appID;
-        this.groupPositionOffset = params.groupPositionOffset;
+        this.groupPositionOffset = {x: params.offset.x, y: params.offset.y};
     }
 }

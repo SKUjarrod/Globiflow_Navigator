@@ -169,17 +169,19 @@ function GetActionData(actionDetails, actionName) {
 function GenerateDataStructure(readData, workspaceNode) {
 // generate app data structures in here too
 
-
     let actions = ParseActions(readData);
 
     let appOffset = CalculateAppOffsets(readData);
 
-    var dataStructure = new DataStructure({
+    var appDataStructure;
+
+    var dataStructure = new FlowDataStructure({
         flowName: readData._flowName,
         flowID: readData._flowID,
         offset:{x: appOffset.x, y: appOffset.y},
-        description: readData._description,
         appID: readData._appID,
+        appDataStructure: appDataStructure,
+        description: readData._description,
         appName: readData._appName,
         workSpace: readData._workSpace,
         flowActions: actions,
@@ -193,8 +195,15 @@ function GenerateDataStructure(readData, workspaceNode) {
     // check if a flow for an app has been imported yet
     if (!CheckAppExists(readData._appID)) {
         // app doesn't exist, create app and then flow under it
+
+        appDataStructure = new AppDataStructure({
+            appName: readData._appName,
+            appID: readData._appID,
+            offset:{x: appOffset.x, y: appOffset.y}
+        })
+
         let node = treeRoot.find(readData._workSpace, TreeNodeTypes.W);
-        object.data.appNode = treeRoot.insert(node.key, readData._appID, TreeNodeTypes.A, readData._appName); // create app node
+        object.data.appNode = treeRoot.insert(node.key, readData._appID, TreeNodeTypes.A, appDataStructure); // create app node
     }
 
     // (todo) update this so it starts search in workSpace. Can get workspace from readData
@@ -256,7 +265,7 @@ function CalculateConnections(flow) {
                     // CreateUFFlow(actionKey);
                 }
 
-                break
+                break;
 
             case "triggerSelf":
                 actionKey = element.actionDetails[1][1][1];
@@ -278,7 +287,7 @@ function CalculateConnections(flow) {
                     // fix this to be start in node.key
                     // flow.forwardConnections.push(treeRoot.findIn(actionKey, flow.appNode, TreeNodeTypes.UF));
                 }
-                break
+                break;
         
             default:
                 break;
