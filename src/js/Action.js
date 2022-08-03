@@ -11,5 +11,6 @@ class Action {
         this.actionType = params.actionType;
         this.actionDetails = params.actionDetails;
         this.nextAction = params.nextAction;
+        this.actionNode = params.actionNode;
     }
 }

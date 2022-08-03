@@ -7,6 +7,8 @@
 
 * TODO LIST 
 
+work on app dataStructures to fix connections to apps (not flows) and their positions being stored
+
 fix connection line scaling issue and drift.
 
 need to change way flowConnection lines are drawn. Change it so it only updates apps and flows that were modified in the frame e.g. position, scale...  Currently it updates every connection line

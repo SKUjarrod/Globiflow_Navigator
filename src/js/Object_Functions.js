@@ -107,7 +107,7 @@ function CreateFlowConnectionArrow() {
             
             for (let j = 0; j < nodes[i].value.data.forwardConnections.length; j++) {
                 const connection = nodes[i].value.data.forwardConnections[j];
-                if (connection.type != TreeNodeTypes.UF) { /* dont know if need to check that the connection ref isn't itself */   
+                if (connection.type != TreeNodeTypes.U) { /* dont know if need to check that the connection ref isn't itself */   
 
                     let lineObj = two.makeLine(connection.value.data.groupPositionOffset.x, connection.value.data.groupPositionOffset.y, nodes[i].value.data.groupPositionOffset.x, nodes[i].value.data.groupPositionOffset.y);
                     lineObj.id = "Connection Line";

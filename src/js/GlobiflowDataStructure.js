@@ -1,10 +1,3 @@
-// let flowName = "";
-// // let flowID = "";
-// let position = {x: 0, y: 0};
-// // let childrenObjects = []; // this will hold actions the flow performs
-// let groupPositionOffset = {x: 0, y: 0};
-// let selected = false;
-
 const workspaces = {
     Business_Development: 'Business Development',
     Financial_Operations: 'Financial Operations',
@@ -31,6 +24,11 @@ const workspaces = {
  *  let flowActions = []; // Array of Actions. Order matters
  * 
  *
+// let flowName = "";
+// // let flowID = "";
+// // let childrenObjects = []; // this will hold actions the flow performs
+// let groupPositionOffset = {x: 0, y: 0};
+// let selected = false;
 
 // not sure if i need this variables yet.
 // possible cache of connections
@@ -49,8 +47,22 @@ class DataStructure {
         this.selected = false;
         this.groupPositionOffset = {x: params.offset.x, y: params.offset.y};
         this.workSpace = params.workSpace;
-        this.flowActions = params.flowActions
+        this.flowActions = params.flowActions;
+        
+        this.flowNode = params.flowNode;
+        this.workspaceNode = params.workspaceNode;
+        this.appNode = params.appNode;
+
         this.forwardConnections = params.forwardConnections;
         this.backwardConnections = params.backwardConnections;
+    }
+}
+
+
+class AppDataStructure {
+    constructor(params) {
+        this.appName = params.appName;
+        this.appID = params.appID;
+        this.groupPositionOffset = params.groupPositionOffset;
     }
 }

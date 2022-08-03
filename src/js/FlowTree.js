@@ -85,7 +85,7 @@ class Tree {
         if (node.key === parentNodeKey) {
           node.children.push(new TreeNode(key, type, value, node));
           this.NodeCount++;
-          return true;
+          return node.children[node.children.length-1];
         }
       }
       return false;
@@ -116,7 +116,7 @@ class Tree {
        * @param {*} node is the node to start looking from
        * @param {*} type is the type of node searching for
        */
-      findIn(key, node, type) {
+      findIn(key, node, type = null) {
         for (let fNode of this.preOrderTraversal(node)) {
           if (fNode.key === key && fNode.type === type) return fNode;
         }
@@ -129,6 +129,6 @@ const TreeNodeTypes = {
   W: "Workspace",
   A: "App",
   F: "Flow",
-  UF: "Uninitalised Flow",
+  U: "Uninitalised",
   Ac: "Action"
 }

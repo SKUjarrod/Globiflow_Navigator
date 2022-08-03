@@ -78,11 +78,12 @@ function startXMLParse(fileName, XMLResult) {
         
         // check if workspace exists here. Create new root tree here if doesn't exist
 
+        let workspaceNode;
         if (!CheckWorkspaceExists(data._workSpace)) {
-            treeRoot.insert("Root", data._workSpace, TreeNodeTypes.W, data._workSpace);
+            workspaceNode = treeRoot.insert("Root", data._workSpace, TreeNodeTypes.W, data._workSpace);
         }
 
-        let flowDataObject = GenerateDataStructure(data);
+        let flowDataObject = GenerateDataStructure(data, workspaceNode);
         CalculateConnections(flowDataObject.data);
 
         // (maybe done?) maybe move this to FileIO.js in the multi file reader function so it only runs once when all files have been read. Currently its not batching and running every file which isnt really batching
@@ -165,7 +166,9 @@ function GetActionData(actionDetails, actionName) {
 }
 
 // generate the GlobiflowDataStructure class for an object based on the parsed xml from a file
-function GenerateDataStructure(readData) {
+function GenerateDataStructure(readData, workspaceNode) {
+// generate app data structures in here too
+
 
     let actions = ParseActions(readData);
 
@@ -180,6 +183,7 @@ function GenerateDataStructure(readData) {
         appName: readData._appName,
         workSpace: readData._workSpace,
         flowActions: actions,
+        workspaceNode: workspaceNode,
         forwardConnections: [],
         backwardConnections: []
     });
@@ -190,24 +194,25 @@ function GenerateDataStructure(readData) {
     if (!CheckAppExists(readData._appID)) {
         // app doesn't exist, create app and then flow under it
         let node = treeRoot.find(readData._workSpace, TreeNodeTypes.W);
-        treeRoot.insert(node.key, readData._appID, TreeNodeTypes.A, readData._appName); // create app node
+        object.data.appNode = treeRoot.insert(node.key, readData._appID, TreeNodeTypes.A, readData._appName); // create app node
     }
 
     // (todo) update this so it starts search in workSpace. Can get workspace from readData
     // Check if flow is undiscovered or is uninitalised and needs to be populated
-    let flowNode = treeRoot.findIn(readData._flowID, treeRoot.root, TreeNodeTypes.UF);
+    let flowNode = treeRoot.findIn(readData._flowID, object.data.workspaceNode, TreeNodeTypes.U);
     if (flowNode !== undefined) {
         // node already exists but is uninitalised
         flowNode.updateTreeNode(readData._flowID, TreeNodeTypes.F, object, flowNode.parent);
     } else {
         // node doesn't exist
         let node = treeRoot.find(readData._appID, TreeNodeTypes.A)
-        treeRoot.insert(node.key, readData._flowID, TreeNodeTypes.F, object); // create flow node
+        object.data.flowNode = treeRoot.insert(node.key, readData._flowID, TreeNodeTypes.F, object); // create flow node
+
     }
 
     for (let i = 0; i < actions.length; i++) {
         const element = actions[i];
-        treeRoot.insert(readData._flowID, i, TreeNodeTypes.Ac, element); // create action node
+        element.actionNode = treeRoot.insert(readData._flowID, i, TreeNodeTypes.Ac, element); // create action node
     }
 
     globalObjectsArray.push(object);
@@ -222,6 +227,7 @@ function GenerateDataStructure(readData) {
 function CalculateConnections(flow) {
     for (let i = 0; i < flow.flowActions.length; i++) {
         const element = flow.flowActions[i];
+        let actionKey, treeSearchResult;    
         switch (element.actionType) {
             case "value":
                 
@@ -232,32 +238,9 @@ function CalculateConnections(flow) {
                 break;
 
             case "getReferenced":
-                // let 
-                // let actionKey = element.actionDetails[1][1][1];
-                // // update this so its not starting search in root
-                // let treeSearchResult = treeRoot.findIn(actionKey, treeRoot.root, TreeNodeTypes.F);
-                // if (treeSearchResult !== undefined) {
-                //     // search result found
-
-                //     // flow.forwardConnections.push(treeRoot.findIn(actionKey, treeRoot.root, TreeNodeTypes.F));
-                //     flow.forwardConnections.push(treeSearchResult);
-                // } else {
-                //     // flow hasn't been imported yet or errored
-
-                //     let node = treeRoot.find(flow.appID, TreeNodeTypes.A)
-                //     treeRoot.insert(node.key, actionKey, TreeNodeTypes.UF, undefined); // create empty flow node with temp actionKey key to import later
-
-                //     // fix this to be start in node.key
-                //     flow.forwardConnections.push(treeRoot.findIn(actionKey, treeRoot.root, TreeNodeTypes.UF));
-                // }
-
-
-                break
-
-            case "triggerSelf":
-                let actionKey = element.actionDetails[1][1][1];
-                // update this so its not starting search in root
-                let treeSearchResult = treeRoot.findIn(actionKey, treeRoot.root, TreeNodeTypes.F);
+                // this is pulling data from an app. scope is app
+                actionKey = element.actionDetails[1][1][1];
+                treeSearchResult = treeRoot.findIn(actionKey, flow.workspaceNode, TreeNodeTypes.A);
                 if (treeSearchResult !== undefined) {
                     // search result found
 
@@ -266,11 +249,34 @@ function CalculateConnections(flow) {
                 } else {
                     // flow hasn't been imported yet or errored
 
-                    let node = treeRoot.find(flow.appID, TreeNodeTypes.A)
-                    treeRoot.insert(node.key, actionKey, TreeNodeTypes.UF, undefined); // create empty flow node with temp actionKey key to import later
+                    let node = treeRoot.findIn(flow.workSpace, treeRoot.root, TreeNodeTypes.W)
+                    flow.forwardConnections.push(treeRoot.insert(node.key, actionKey, TreeNodeTypes.U, undefined)); // create empty flow node with temp actionKey key to import later
+
+
+                    // CreateUFFlow(actionKey);
+                }
+
+                break
+
+            case "triggerSelf":
+                actionKey = element.actionDetails[1][1][1];
+                treeSearchResult = treeRoot.findIn(actionKey, flow.appNode, TreeNodeTypes.F);
+                if (treeSearchResult !== undefined) {
+                    // search result found
+
+                    // flow.forwardConnections.push(treeRoot.findIn(actionKey, treeRoot.root, TreeNodeTypes.F));
+                    flow.forwardConnections.push(treeSearchResult);
+                } else {
+                    // flow hasn't been imported yet or errored
+
+                    // maybe can move this to start search in app node
+                    let node = treeRoot.findIn(flow.appID, flow.workspaceNode, TreeNodeTypes.A)
+                    flow.forwardConnections.push(treeRoot.insert(node.key, actionKey, TreeNodeTypes.U, undefined)); // create empty flow node with temp actionKey key to import later
+
+                    // CreateUFFlow(actionKey, flow.workspaceNode, TreeNodeTypes.A);
 
                     // fix this to be start in node.key
-                    flow.forwardConnections.push(treeRoot.findIn(actionKey, treeRoot.root, TreeNodeTypes.UF));
+                    // flow.forwardConnections.push(treeRoot.findIn(actionKey, flow.appNode, TreeNodeTypes.UF));
                 }
                 break
         
@@ -278,6 +284,13 @@ function CalculateConnections(flow) {
                 break;
         }
     }
+
+
+    // dont know if this is needed yet. use if there ends up being too many copies of creating UF items
+    // function CreateUFFlow(actionKey, node, type) {
+    //     let node = treeRoot.findIn(flow.appID, node, type);
+    //     flow.forwardConnections.push(treeRoot.insert(node.key, actionKey, TreeNodeTypes.UF, undefined)); // create empty flow node with temp actionKey key to import later
+    // }
 }
 
 // decode a base64 encoded string
