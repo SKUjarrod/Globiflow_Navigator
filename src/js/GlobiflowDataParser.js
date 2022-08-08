@@ -325,7 +325,7 @@ function ParseActions(ActionsXML) {
         const step = ActionsXML._actions.childNodes[i];
         let stepType = GetNodeData(step, "stepType");
         let stepFunction = GetNodeData(step, "stepFunction");
-        let stepDetails = ParseActionDetails( Base64Decode( GetNodeData(step, "stepDetails") ));
+        let stepDetails = ParseActionDetails( Base64Decode( GetNodeData(step, "stepDetails") ).match(/(?<={).+(?=})/gm)[0]);
         let stepName = GetActionData(stepDetails, stepFunction); 
         switch (stepType) {
             case "F":   // Filter
@@ -366,9 +366,53 @@ function ParseActions(ActionsXML) {
 // this function parses Action details into something readable and in a format for the connection calculator to do something with
 // takes in decoded base64 and returns array of details about step (Maybe, not sure of return format yet)
 function ParseActionDetails(stepDetails) {
-    let result = [];    
-    let tokens = stepDetails.match(/{.+}/g);
-    tokens = tokens.flat().toString().match( new RegExp(/{|\w+(?=";){2}|(?<=\*)[\w_-]+(?=\*)|}/, 'g') );
+    let result = []; 
+
+    let c = 0, bIndex = 0;
+    let tokens = [];
+    let stepBuffer = [];
+    let active = false; // active means in progress of parsing a step. i.e. in between ""'s
+    while (stepDetails[c] != undefined) {
+        const char = stepDetails[c];
+        if (!active) {
+            // checks for " which is the beginning of a step
+            if (char == '"') {
+                active = true;
+            }
+
+            if (char == '{' || char == '}') {
+                tokens.push(char);
+            }
+        
+        } else {
+            // checks for a new line character. Used to parse rich text steps
+            if (char == "\n") {
+                tokens.push(stepBuffer.join(""));
+                stepBuffer = [];
+                bIndex = 0;
+            }
+
+            // checks for end of step
+            if (char == '"') {
+                active = false;
+                tokens.push(stepBuffer.join(""));
+                stepBuffer = [];
+                bIndex = 0;
+            } else {
+                stepBuffer[bIndex] = char;
+                bIndex++;    
+            }
+        }
+        c++;
+    }
+
+    // let tokensSplit = stepDetails.split("\n");
+    // if (stepDetails) {
+
+    // }
+    // // tokensSplit.forEach( (v, i) => {tokens.push(v.match(/{.+(}|(?=<p>))/mg));} );
+    // // tokens = stepDetails.match(/{.+}/mg);
+    // tokens = tokens.flat().toString().match( new RegExp(/{|\w+(?=";){2}|(?<=\*)[\w_-]+(?=\*)|}/, 'g') );
 
     for (let i = 0; i < tokens.length; i++) {
         const element = tokens[i];
@@ -424,6 +468,19 @@ function ParseActionDetails(stepDetails) {
 
         if (element.includes("app_")) {
             result.push(element, tokens[i+1]);
+        }
+
+        // if (element == "usePodioMail") {
+        // // add mail step stuff. Still yet to complete
+        //     result.push();
+        // }
+
+        if (element == "message") {
+            if (tokens[i+1].indexOf("\r") != -1) {
+                result.push([element, tokens.filter( (token, i) => {return token.includes("\n")? token:undefined} )])
+            } else {
+                result.push([element, tokens[i+1]]);
+            }
         }
     }
 

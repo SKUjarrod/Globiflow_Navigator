@@ -7,8 +7,6 @@
 
 * TODO LIST 
 
-work on app dataStructures to fix connections to apps (not flows) and their positions being stored
-
 fix connection line scaling issue and drift.
 
 need to change way flowConnection lines are drawn. Change it so it only updates apps and flows that were modified in the frame e.g. position, scale...  Currently it updates every connection line
@@ -33,3 +31,7 @@ work on odd number flow positioning
 
 
 Should move/ split up this main file into a data file. So there will be a main file for hooking everything together, data for everything data and Object_Functions for everything physical Two.js elements
+
+
+* NOTE
+the S:n in the base64 decoded step details stand for size. Where n = a number representing num characters
