@@ -413,6 +413,52 @@ function deFocusApp(appElem) {
     two.update();
 }
 
+/////////////// External Entity stuff ///////////
+
+// write this function to create an generic external entity for things such as people that emails send too and comments to specific people
+function MakeExternalEntity(Data) {
+    let groupExist = CheckExternalEntityExists(Data.entityKey);
+    let group;
+    if (groupExist) {
+        group = GetAppGroupInGlobalObjects(Data);
+    } else {
+        group = two.makeGroup();
+        group.id = "External Entity Group";
+        group.uID = nextAvailableUID;
+        nextAvailableUID++;
+
+        SetAppOffsets(group, Data.value.groupPositionOffset.x, Data.value.groupPositionOffset.y)
+
+
+        CreateExternalEntityElement(group, Data);
+        CreateExternalEntityDetails(group, Data);
+        // appObjectArray.push(group);
+    }
+
+    return group;
+
+    function CreateExternalEntityElement(group, currentObjData) {
+        let rect = two.makeRectangle(0, 0, externalEntitySize, externalEntitySize);
+        rect.id = "entity rect";
+        rect.uID = nextAvailableUID;
+        nextAvailableUID++;
+        
+        // rect.verticies
+        two.update();
+        // rect._renderer.elem.addEventListener('click', (e) => {two.update(); SelectApp(group, e);}, false);
+        group.add(rect);
+    }
+
+    function CreateExternalEntityDetails(params) {
+        // add details into entity here
+    }
+
+}
+
+/////////////// End visual creation stuff ///////////
+
+
+
 // (todo) fix issue with scaling. Might have to do some matrix calculations
 // set the data partion of the flow object to be the global transform of the object
 function UpdateObjectGlobaltransform() {

@@ -7,3 +7,5 @@ const appSize = 300;
 const appInnerPadding = 5; // will be 5px
 const appTopOffset = 30; // will be 20px
 
+// external Entity sizes
+const externalEntitySize = 30;

@@ -128,6 +128,7 @@ const TreeNodeTypes = {
   R: "Root",
   W: "Workspace",
   A: "App",
+  EE: "External Entity",
   F: "Flow",
   U: "Uninitalised",
   Ac: "Action"

@@ -112,3 +112,15 @@ function GetFlowGroupsInAppObject(appGroup) {
     }
     return flowGroups; 
 }
+
+/**
+ * 
+ * @param {*} parentFlow is the flow that it is connected to or has a relation with
+ * @returns a position that should be close to its parent flow
+ */
+function CalculateExternalEntityOffset(parentFlow) {
+    // write the calculate position close to parentFlow position code
+
+    return {x: parentFlow.groupPositionOffset + 50, y: parentFlow.groupPositionOffset + 50};
+    // return {x: Math.random()*1000, y: Math.random()*1000};
+}

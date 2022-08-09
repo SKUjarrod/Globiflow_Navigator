@@ -40,6 +40,7 @@ const workspaces = {
  */
 class FlowDataStructure {
     constructor(params) {
+        // this.flowKey = params.flowKey;
         this.flowName = params.flowName;
         this.flowID = params.flowID;
         this.appName = params.appName;
@@ -62,8 +63,17 @@ class FlowDataStructure {
 
 class AppDataStructure {
     constructor(params) {
+        // this.appKey = params.appKey;
         this.appName = params.appName;
         this.appID = params.appID;
+        this.groupPositionOffset = {x: params.offset.x, y: params.offset.y};
+    }
+}
+
+class ExternalEntityDataStructure {
+    constructor(params) {
+        this.entityKey = params.entityKey;
+        this.entityName = params.entityName;
         this.groupPositionOffset = {x: params.offset.x, y: params.offset.y};
     }
 }

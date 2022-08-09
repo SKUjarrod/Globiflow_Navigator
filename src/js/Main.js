@@ -73,16 +73,13 @@ var zuiStage = new Two.ZUI(stage); // forground elements
 var zuiConnections = new Two.ZUI(connections); // background line connection elements
 
 
-// let max = 1;//globalObjectsArray.length + 1; //currently used for creating connection lines
-
-
 // add data object as attribute to flow group object.
 
 // Create some buffer for this. When buffer updates, run this code to make new box and then remove it from buffer
 function CreateVisualElement() {
 // Creates the visual elements with twojs
     let batchCount = objectAddBuffer.length
-    let appGroup;
+    let appGroup, externalEntitiesGroup;
     for (let i = 0; i < batchCount; i++) {
         let element = objectAddBuffer.pop();
         let data = element.data;
@@ -90,6 +87,16 @@ function CreateVisualElement() {
         appGroup = MakeAppElement(data);
 
         let group = MakeFlow(data);
+
+        // create external entities here
+        // work out some system to create multiple external entities for each flow batch
+        for (let eEntity = 0; eEntity < data.forwardConnections.length; eEntity++) {
+            const element = data.forwardConnections[eEntity];
+            if (element.type = TreeNodeTypes.EE) {
+                externalEntitiesGroup = MakeExternalEntity(element);
+                stage.add(externalEntitiesGroup);
+            }
+        }
 
         element.object = group;
         group.dataStructure = data;
@@ -110,15 +117,15 @@ addZUI();
 two.update();
 
 
-// to test element positions
-domElement.addEventListener('mousemove', event =>
-{
-    let bound = domElement.getBoundingClientRect();
+// // to test element positions
+// domElement.addEventListener('mousemove', event =>
+// {
+//     let bound = domElement.getBoundingClientRect();
 
-    let x = event.clientX - bound.left - domElement.clientLeft;
-    let y = event.clientY - bound.top - domElement.clientTop;
+//     let x = event.clientX - bound.left - domElement.clientLeft;
+//     let y = event.clientY - bound.top - domElement.clientTop;
 
-    console.warn("X: " + x);
-    console.warn("Y: " + y);
-    // context.fillRect(x, y, 16, 16);
-});
+//     console.warn("X: " + x);
+//     console.warn("Y: " + y);
+//     // context.fillRect(x, y, 16, 16);
+// });

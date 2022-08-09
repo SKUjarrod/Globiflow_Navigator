@@ -231,77 +231,6 @@ function GenerateDataStructure(readData, workspaceNode) {
     // Once flowDataStructure has been added to global arrays, create its app
 }
 
-// calculate the connections to and from a given flow for the GlobiflowDataStructure class for the flow object.
-// this is to calculate where to draw lines
-function CalculateConnections(flow) {
-    for (let i = 0; i < flow.flowActions.length; i++) {
-        const element = flow.flowActions[i];
-        let actionKey, treeSearchResult;    
-        switch (element.actionType) {
-            case "value":
-                
-                break;
-
-            case "createMessage":
-            
-                break;
-
-            case "getReferenced":
-                // this is pulling data from an app. scope is app
-                actionKey = element.actionDetails[1][1][1];
-                treeSearchResult = treeRoot.findIn(actionKey, flow.workspaceNode, TreeNodeTypes.A);
-                if (treeSearchResult !== undefined) {
-                    // search result found
-
-                    // flow.forwardConnections.push(treeRoot.findIn(actionKey, treeRoot.root, TreeNodeTypes.F));
-                    flow.forwardConnections.push(treeSearchResult);
-                } else {
-                    // flow hasn't been imported yet or errored
-
-                    let node = treeRoot.findIn(flow.workSpace, treeRoot.root, TreeNodeTypes.W)
-                    flow.forwardConnections.push(treeRoot.insert(node.key, actionKey, TreeNodeTypes.U, undefined)); // create empty flow node with temp actionKey key to import later
-
-
-                    // CreateUFFlow(actionKey);
-                }
-
-                break;
-
-            case "triggerSelf":
-                actionKey = element.actionDetails[1][1][1];
-                treeSearchResult = treeRoot.findIn(actionKey, flow.appNode, TreeNodeTypes.F);
-                if (treeSearchResult !== undefined) {
-                    // search result found
-
-                    // flow.forwardConnections.push(treeRoot.findIn(actionKey, treeRoot.root, TreeNodeTypes.F));
-                    flow.forwardConnections.push(treeSearchResult);
-                } else {
-                    // flow hasn't been imported yet or errored
-
-                    // maybe can move this to start search in app node
-                    let node = treeRoot.findIn(flow.appID, flow.workspaceNode, TreeNodeTypes.A)
-                    flow.forwardConnections.push(treeRoot.insert(node.key, actionKey, TreeNodeTypes.U, undefined)); // create empty flow node with temp actionKey key to import later
-
-                    // CreateUFFlow(actionKey, flow.workspaceNode, TreeNodeTypes.A);
-
-                    // fix this to be start in node.key
-                    // flow.forwardConnections.push(treeRoot.findIn(actionKey, flow.appNode, TreeNodeTypes.UF));
-                }
-                break;
-        
-            default:
-                break;
-        }
-    }
-
-
-    // dont know if this is needed yet. use if there ends up being too many copies of creating UF items
-    // function CreateUFFlow(actionKey, node, type) {
-    //     let node = treeRoot.findIn(flow.appID, node, type);
-    //     flow.forwardConnections.push(treeRoot.insert(node.key, actionKey, TreeNodeTypes.UF, undefined)); // create empty flow node with temp actionKey key to import later
-    // }
-}
-
 // decode a base64 encoded string
 function Base64Decode(base64Encoded) {
     let result = atob(base64Encoded);
@@ -325,7 +254,7 @@ function ParseActions(ActionsXML) {
         const step = ActionsXML._actions.childNodes[i];
         let stepType = GetNodeData(step, "stepType");
         let stepFunction = GetNodeData(step, "stepFunction");
-        let stepDetails = ParseActionDetails( Base64Decode( GetNodeData(step, "stepDetails") ).match(/(?<={).+(?=})/gm)[0]);
+        let stepDetails = ParseActionDetails( Base64Decode( GetNodeData(step, "stepDetails") ).match(/(?<={)(.|\n| |\r)+(?=})/gm)[0]);
         let stepName = GetActionData(stepDetails, stepFunction); 
         switch (stepType) {
             case "F":   // Filter
@@ -380,6 +309,7 @@ function ParseActionDetails(stepDetails) {
                 active = true;
             }
 
+            // checks for "{ }" pairs and push's them as tokens. used to indicate recursion on groups later
             if (char == '{' || char == '}') {
                 tokens.push(char);
             }
@@ -405,14 +335,6 @@ function ParseActionDetails(stepDetails) {
         }
         c++;
     }
-
-    // let tokensSplit = stepDetails.split("\n");
-    // if (stepDetails) {
-
-    // }
-    // // tokensSplit.forEach( (v, i) => {tokens.push(v.match(/{.+(}|(?=<p>))/mg));} );
-    // // tokens = stepDetails.match(/{.+}/mg);
-    // tokens = tokens.flat().toString().match( new RegExp(/{|\w+(?=";){2}|(?<=\*)[\w_-]+(?=\*)|}/, 'g') );
 
     for (let i = 0; i < tokens.length; i++) {
         const element = tokens[i];
@@ -463,17 +385,24 @@ function ParseActionDetails(stepDetails) {
         }
 
         if (element == "flow") {
-            result.push(element, tokens[i+1]);
+            result.push([element, tokens[i+1]]);
         }
 
         if (element.includes("app_")) {
-            result.push(element, tokens[i+1]);
+            result.push([element, tokens[i+1]]);
         }
 
-        // if (element == "usePodioMail") {
-        // // add mail step stuff. Still yet to complete
-        //     result.push();
-        // }
+        if (element == "usePodioMail") {
+        // add mail step stuff. Still yet to complete
+            result.push([element, [ 
+                [tokens[i+5], tokens[i+6]], 
+                [tokens[i+7], tokens[i+8]], 
+                [tokens[i+11], tokens[i+12]], 
+                [tokens[i+13], tokens[i+14]], 
+                [tokens[i+15], tokens[i+16]], 
+                [tokens[i+17], tokens[i+18]] 
+            ]]);
+        }
 
         if (element == "message") {
             if (tokens[i+1].indexOf("\r") != -1) {
@@ -486,6 +415,94 @@ function ParseActionDetails(stepDetails) {
 
     return result;
 }
+
+
+// calculate the connections to and from a given flow for the GlobiflowDataStructure class for the flow object.
+// this is to calculate where to draw lines
+function CalculateConnections(flow) {
+    for (let i = 0; i < flow.flowActions.length; i++) {
+        const element = flow.flowActions[i];
+        let actionKey, treeSearchResult, dataStructure;    
+        switch (element.actionType) {
+            case "value":
+                
+                break;
+
+            // case "createMessage":
+            
+            //     break;
+
+            case "sendEmail":
+                // email key will be its subject. This is the most unique part of the email, i believe.
+                actionKey = element.actionDetails[1][1][5][1];
+                treeSearchResult = treeRoot.findIn(actionKey, flow.workspaceNode, TreeNodeTypes.EE);
+                if (treeSearchResult !== undefined) {
+                    // search result found
+
+                    flow.forwardConnections.push(treeSearchResult);
+                } else {
+                    // flow hasn't been imported yet or errored
+                    dataStructure = new ExternalEntityDataStructure({
+                        entityName: actionKey,
+                        // entityKey: readData.entityKey,
+                        offset: CalculateExternalEntityOffset(flow)
+                        // offset:{x: appOffset.x, y: appOffset.y},
+                    });
+
+                    let node = treeRoot.findIn(flow.workSpace, treeRoot.root, TreeNodeTypes.W)
+                    // need to figure out what to put into tree node's value parameter.
+                    flow.forwardConnections.push(treeRoot.insert(node.key, actionKey, TreeNodeTypes.EE, dataStructure)); // create empty External Entity node with actionKey key to connect too. Physical object will be created later                  
+                }
+
+                break;
+
+            case "updateItem":
+            
+                break;
+    
+            // case "":
+            
+            //     break;
+
+            case "getReferenced":
+                // this is pulling data from an app. scope is app
+                actionKey = element.actionDetails[1][1][1];
+                treeSearchResult = treeRoot.findIn(actionKey, flow.workspaceNode, TreeNodeTypes.A);
+                if (treeSearchResult !== undefined) {
+                    // search result found
+
+                    flow.forwardConnections.push(treeSearchResult);
+                } else {
+                    // flow hasn't been imported yet or errored
+
+                    let node = treeRoot.findIn(flow.workSpace, treeRoot.root, TreeNodeTypes.W)
+                    flow.forwardConnections.push(treeRoot.insert(node.key, actionKey, TreeNodeTypes.U, undefined)); // create empty flow node with temp actionKey key to import later
+                }
+
+                break;
+
+            case "triggerSelf":
+                actionKey = element.actionDetails[1][1][1];
+                treeSearchResult = treeRoot.findIn(actionKey, flow.appNode, TreeNodeTypes.F);
+                if (treeSearchResult !== undefined) {
+                    // search result found
+
+                    flow.forwardConnections.push(treeSearchResult);
+                } else {
+                    // flow hasn't been imported yet or errored
+
+                    // maybe can move this to start search in app node
+                    let node = treeRoot.findIn(flow.appID, flow.workspaceNode, TreeNodeTypes.A)
+                    flow.forwardConnections.push(treeRoot.insert(node.key, actionKey, TreeNodeTypes.U, undefined)); // create empty flow node with temp actionKey key to import later
+                }
+                break;
+        
+            default:
+                break;
+        }
+    }
+}
+
 
 //// Check funtions ////
 
@@ -514,6 +531,14 @@ function CheckWorkspaceExists(workspace) {
             }
         }
     }
+    return false;
+}
+
+function CheckExternalEntityExists(entityKey) {
+    let result = treeRoot.find(entityKey, TreeNodeTypes.EE);
+    if (result != undefined)
+        return true;
+
     return false;
 }
 

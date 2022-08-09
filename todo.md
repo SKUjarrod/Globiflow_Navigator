@@ -7,7 +7,13 @@
 
 * TODO LIST 
 
+could possibly salvage the podio API code by using podio api to pull data from podio about fields e.g. updating a item  gives the enum of the option selected from the catagory field in the podio app. Could use podio API to get the name of the category under the selected enum value.???????
+
 fix connection line scaling issue and drift.
+
+fix the CalculateExternalEntityOffset parentFlow offset code. it currently doesn't go to the parentFlow's current position, i think it goes to the randomly generated position when the flow element is created
+
+refactor all old globalArray code into new tree data structure to represent data relations
 
 need to change way flowConnection lines are drawn. Change it so it only updates apps and flows that were modified in the frame e.g. position, scale...  Currently it updates every connection line
 
@@ -15,15 +21,12 @@ create tree structure for flows
 
 fix slight offset of flows when opening and closing apps. In Object_Functions.js. Bus is with the scaling of the groups from the anchor which is top left i believe
 
-calculating action details doesnt work for email actions yet
-
 
 create view for focused elements
 
 create html banner elements
 develop workspace scene switching
 make temp app selection
-figure out how apps with nested flows will look like
 work on state serialisation
 
 work on app position offsets
