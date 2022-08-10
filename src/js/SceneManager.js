@@ -121,6 +121,5 @@ function GetFlowGroupsInAppObject(appGroup) {
 function CalculateExternalEntityOffset(parentFlow) {
     // write the calculate position close to parentFlow position code
 
-    return {x: parentFlow.groupPositionOffset + 50, y: parentFlow.groupPositionOffset + 50};
-    // return {x: Math.random()*1000, y: Math.random()*1000};
+    return {x: parentFlow.groupPositionOffset.x + 350, y: parentFlow.groupPositionOffset.y};
 }

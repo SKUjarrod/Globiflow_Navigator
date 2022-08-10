@@ -425,9 +425,9 @@ function CalculateConnections(flow) {
         let actionKey, treeSearchResult, dataStructure;    
         switch (element.actionType) {
             case "value":
-                
+            
                 break;
-
+            
             // case "createMessage":
             
             //     break;
@@ -443,8 +443,8 @@ function CalculateConnections(flow) {
                 } else {
                     // flow hasn't been imported yet or errored
                     dataStructure = new ExternalEntityDataStructure({
-                        entityName: actionKey,
-                        // entityKey: readData.entityKey,
+                        entityKey: actionKey,
+                        // entityName: readData.entityKey,
                         offset: CalculateExternalEntityOffset(flow)
                         // offset:{x: appOffset.x, y: appOffset.y},
                     });
@@ -456,8 +456,12 @@ function CalculateConnections(flow) {
 
                 break;
 
+            // this is for a flow updating a podio item in itself.
+            // need to check if this is correct
             case "updateItem":
-            
+                // actionKey = flow.appNode.key;
+                // update this connection to some sort of smooth loop connection arrow
+                flow.forwardConnections.push(flow.appNode);
                 break;
     
             // case "":

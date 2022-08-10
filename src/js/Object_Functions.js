@@ -2,6 +2,8 @@
 // All Physical element stuff in this file
 //
 
+const { Matrix } = require("two.js/src/matrix");
+
 let currentlyOpenedGroup;
 let currentlyOpenedAppGroup;
 
@@ -80,11 +82,6 @@ function CreateFlowDetails(group, currentObj) {
         detailArray.push(actionsObject);
     }
 
-    // let testTextObject = new Two.Text("test: " + testText, 0, 10, 'normal');
-    // testTextObject.id = "testTextObject";
-    // testTextObject.size = 10;
-    // detailArray.push(testTextObject);
-
     // loop through all detailArray items and add them to group
     for (let index = 0; index < detailArray.length; index++) {
         const detail = detailArray[index];
@@ -94,11 +91,7 @@ function CreateFlowDetails(group, currentObj) {
 
 // create all the connections between objects
 function CreateFlowConnectionArrow() {
-    for (let i = 0; i < connections.children.length; i++) {
-        const element = connections.children[i];
-        connections.remove(element);
-        element.remove();
-    }
+    connections.children.splice(0, connections.length);
     
     two.update();
     let nodes = [...treeRoot.preOrderTraversal()];
@@ -111,8 +104,6 @@ function CreateFlowConnectionArrow() {
 
                     let connectionOffsetX;
                     let connectionOffsetY;
-                    // let nodeOffsetX;
-                    // let nodeOffsetY;
 
                     if (connection.value.data == undefined) {
                         connectionOffsetX = connection.value.groupPositionOffset.x;
@@ -121,14 +112,6 @@ function CreateFlowConnectionArrow() {
                         connectionOffsetX = connection.value.data.groupPositionOffset.x;
                         connectionOffsetY = connection.value.data.groupPositionOffset.y;
                     }
-
-                    // if (nodes[i].value.data.groupPositionOffset == undefined) {
-                    //     nodeOffsetX =;
-                    //     nodeOffsetY =;
-                    // } else {
-                    //     nodeOffsetX = nodes[i].value.data.groupPositionOffset.x;
-                    //     nodeOffsetY = nodes[i].value.data.groupPositionOffset.y;
-                    // }
 
                     let lineObj = two.makeLine(connectionOffsetX, connectionOffsetY, nodes[i].value.data.groupPositionOffset.x, nodes[i].value.data.groupPositionOffset.y);
                     lineObj.id = "Connection Line";
@@ -407,7 +390,7 @@ function deFocusApp(appElem) {
             if (element.dataStructure.selected) {
                 CloseFlow(element, element.dataStructure);
             }
-            // element.visible = false;
+            element.visible = false;
         }
     }
     two.update();
@@ -469,11 +452,29 @@ function UpdateObjectGlobaltransform() {
             let element = nodes[i].value.object;
             let DOMRect = element.getBoundingClientRect();
 
+            let matrixStage = new Matrix();
+
+            let matrixTranslate = new Matrix();
+            let matrixScale = new Matrix();
+            
             nodes[i].value.data.groupPositionOffset.x = ((DOMRect.left + (DOMRect.width / 2)) - zuiStage.surfaceMatrix.elements[2]) * zuiStage.surfaceMatrix.elements[0];
             nodes[i].value.data.groupPositionOffset.y = ((DOMRect.top + (DOMRect.height / 2)) - zuiStage.surfaceMatrix.elements[5]) * zuiStage.surfaceMatrix.elements[4] ;
         }
     }  
 }
+
+
+// to update for scale, forumla is:
+//
+
+/* 
+
+stage group m0 | m3 (should be the same value is scaled uniformly) 
+(for minimising scale)
+x' = 1-(Stage group) m0 * (child object) m4 - (stage group) m4
+y' = 1-(stage group) m0
+
+*/
 
 
 

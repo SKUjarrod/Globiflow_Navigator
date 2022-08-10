@@ -9,6 +9,10 @@
 
 could possibly salvage the podio API code by using podio api to pull data from podio about fields e.g. updating a item  gives the enum of the option selected from the catagory field in the podio app. Could use podio API to get the name of the category under the selected enum value.???????
 
+switch connections over to their own object that contains all current data. This will allow for the same connection behaiour but also to incorperate some meta data like the connection name e.g. this updates this, this flow references this app
+
+convert all the object postion transforms into transformation matricies and add scaling to them
+
 fix connection line scaling issue and drift.
 
 fix the CalculateExternalEntityOffset parentFlow offset code. it currently doesn't go to the parentFlow's current position, i think it goes to the randomly generated position when the flow element is created

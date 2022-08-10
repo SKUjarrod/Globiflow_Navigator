@@ -92,7 +92,7 @@ function CreateVisualElement() {
         // work out some system to create multiple external entities for each flow batch
         for (let eEntity = 0; eEntity < data.forwardConnections.length; eEntity++) {
             const element = data.forwardConnections[eEntity];
-            if (element.type = TreeNodeTypes.EE) {
+            if (element.type == TreeNodeTypes.EE) {
                 externalEntitiesGroup = MakeExternalEntity(element);
                 stage.add(externalEntitiesGroup);
             }
@@ -117,15 +117,15 @@ addZUI();
 two.update();
 
 
-// // to test element positions
-// domElement.addEventListener('mousemove', event =>
-// {
-//     let bound = domElement.getBoundingClientRect();
+// to test element positions
+domElement.addEventListener('mousemove', event =>
+{
+    let bound = domElement.getBoundingClientRect();
 
-//     let x = event.clientX - bound.left - domElement.clientLeft;
-//     let y = event.clientY - bound.top - domElement.clientTop;
+    let x = event.clientX - bound.left - domElement.clientLeft;
+    let y = event.clientY - bound.top - domElement.clientTop;
 
-//     console.warn("X: " + x);
-//     console.warn("Y: " + y);
-//     // context.fillRect(x, y, 16, 16);
-// });
+    console.warn("X: " + x);
+    console.warn("Y: " + y);
+    // context.fillRect(x, y, 16, 16);
+});
