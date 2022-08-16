@@ -52,7 +52,7 @@ require_once __DIR__ . '\SessionManager.php';
 
 
 // display html
-$file = "C:/xampp/htdocs/src/html/index.html";
+$file = "../../src/html/index.html";
 echo file_get_contents($file);
 // echo "<script>getPodioData();</script>";
 //
