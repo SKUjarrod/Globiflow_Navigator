@@ -464,7 +464,7 @@ function UpdateObjectGlobaltransform() {
             nodes[i].value.data.groupPositionOffset.x = newMatrix.elements[5];
             nodes[i].value.data.groupPositionOffset.y = newMatrix.elements[6];
 
-
+ 
             // nodes[i].value.data.groupPositionOffset.x = ((DOMRect.left + (DOMRect.width / 2)) - zuiStage.surfaceMatrix.elements[2]) * zuiStage.surfaceMatrix.elements[0];
             // nodes[i].value.data.groupPositionOffset.y = ((DOMRect.top + (DOMRect.height / 2)) - zuiStage.surfaceMatrix.elements[5]) * zuiStage.surfaceMatrix.elements[4] ;
         }
