@@ -2,7 +2,7 @@
 // All Physical element stuff in this file
 //
 
-const { Matrix } = require("two.js/src/matrix");
+
 
 let currentlyOpenedGroup;
 let currentlyOpenedAppGroup;
@@ -452,13 +452,21 @@ function UpdateObjectGlobaltransform() {
             let element = nodes[i].value.object;
             let DOMRect = element.getBoundingClientRect();
 
-            let matrixStage = new Matrix();
+            // new Matrix();
+            let matrixStage = zuiStage.surfaceMatrix;
 
             let matrixTranslate = new Matrix();
-            let matrixScale = new Matrix();
-            
-            nodes[i].value.data.groupPositionOffset.x = ((DOMRect.left + (DOMRect.width / 2)) - zuiStage.surfaceMatrix.elements[2]) * zuiStage.surfaceMatrix.elements[0];
-            nodes[i].value.data.groupPositionOffset.y = ((DOMRect.top + (DOMRect.height / 2)) - zuiStage.surfaceMatrix.elements[5]) * zuiStage.surfaceMatrix.elements[4] ;
+            // Matrix(1, 0, 0, 0, (DOMRect.left + (DOMRect.width / 2)), (DOMRect.top + (DOMRect.height / 2)), 0, 0, 1);
+            let matrixScale = new Matrix((1-matrixStage.elements[0] * 1), 0, 0, 0, (1), 0, 0, 0, 1);
+
+            let newMatrix = Matrix.Multiply(matrixStage, matrixTranslate, matrixScale)
+
+            nodes[i].value.data.groupPositionOffset.x = newMatrix.elements[5];
+            nodes[i].value.data.groupPositionOffset.y = newMatrix.elements[6];
+
+
+            // nodes[i].value.data.groupPositionOffset.x = ((DOMRect.left + (DOMRect.width / 2)) - zuiStage.surfaceMatrix.elements[2]) * zuiStage.surfaceMatrix.elements[0];
+            // nodes[i].value.data.groupPositionOffset.y = ((DOMRect.top + (DOMRect.height / 2)) - zuiStage.surfaceMatrix.elements[5]) * zuiStage.surfaceMatrix.elements[4] ;
         }
     }  
 }
