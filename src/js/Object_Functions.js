@@ -2,8 +2,6 @@
 // All Physical element stuff in this file
 //
 
-
-
 let currentlyOpenedGroup;
 let currentlyOpenedAppGroup;
 
@@ -337,20 +335,20 @@ function SelectApp(currentAppGroup, e) {
                 
             // }
             UpdateObjectGlobaltransform();
-
+            
             currentlyOpenedAppGroup = currentAppGroup;
         }
-
+        
         function CloseApp(currentAppGroup) {
             currentAppGroup.matrix.scale(0.5, 0.5);
             two.update();
             currentAppGroup.matrix.manual = false;
             deFocusApp(currentAppGroup);
-
+            
             currentlyOpenedAppGroup = undefined;
             UpdateObjectGlobaltransform();
         }
-
+        
         CreateFlowConnectionArrow();
     }
 }
@@ -364,10 +362,10 @@ function FocusApp(appElem) {
         originalAppOrderIndex = index;
         return Elem.uID === appElem.uID;
     });
-
+    
     orderArrayRef.splice(originalAppOrderIndex, 1);
     orderArrayRef.unshift(temp);
-
+    
     for (let i = 0; i < appElem.children.length; i++) {
         const element = appElem.children[i];
         if (element.id == "Flow Group") {
@@ -383,14 +381,14 @@ function deFocusApp(appElem) {
     let orderArrayRef = appElem.parent.children;
     let elem = orderArrayRef.shift();
     orderArrayRef.splice(originalAppOrderIndex, 0, elem);
-
+    
     for (let i = 0; i < appElem.children.length; i++) {
         const element = appElem.children[i];
         if (element.id == "Flow Group") {
             if (element.dataStructure.selected) {
                 CloseFlow(element, element.dataStructure);
             }
-            element.visible = false;
+            // element.visible = false;
         }
     }
     two.update();
@@ -409,15 +407,15 @@ function MakeExternalEntity(Data) {
         group.id = "External Entity Group";
         group.uID = nextAvailableUID;
         nextAvailableUID++;
-
+        
         SetAppOffsets(group, Data.value.groupPositionOffset.x, Data.value.groupPositionOffset.y)
-
-
+        
+        
         CreateExternalEntityElement(group, Data);
         CreateExternalEntityDetails(group, Data);
         // appObjectArray.push(group);
     }
-
+    
     return group;
 
     function CreateExternalEntityElement(group, currentObjData) {
@@ -431,11 +429,11 @@ function MakeExternalEntity(Data) {
         // rect._renderer.elem.addEventListener('click', (e) => {two.update(); SelectApp(group, e);}, false);
         group.add(rect);
     }
-
+    
     function CreateExternalEntityDetails(params) {
         // add details into entity here
     }
-
+    
 }
 
 /////////////// End visual creation stuff ///////////
@@ -451,22 +449,47 @@ function UpdateObjectGlobaltransform() {
         if (nodes[i].type == TreeNodeTypes.F && nodes[i].value.data != undefined) {
             let element = nodes[i].value.object;
             let DOMRect = element.getBoundingClientRect();
-
-            // new Matrix();
+            
+            ////// matrix stuff
             let matrixStage = zuiStage.surfaceMatrix;
+            
+            // let matrixTranslate = new Two.Matrix(1, 0, 0, 0, (DOMRect.left + (DOMRect.width / 2)), (DOMRect.top + (DOMRect.height / 2)), 0, 0, 1);
+            // let matrixScale = new Two.Matrix((1-matrixStage.elements[0] * (element.parent._matrix.elements[5] - matrixStage.elements[4]) ), 0, 0, 0, (1), 0, 0, 0, 1);
+            
+            // let newMatrix = new Two.Matrix(); 
+            // Two.Matrix.Multiply(matrixStage.elements, matrixTranslate.elements, newMatrix.elements);
+            // Two.Matrix.Multiply(newMatrix.elements, matrixScale.elements, newMatrix.elements);
+            
+            // nodes[i].value.data.groupPositionOffset.x = newMatrix.elements[5];
+            // nodes[i].value.data.groupPositionOffset.y = newMatrix.elements[6];
+            
+            /////////////////
+            
+            // nodes[i].value.data.groupPositionOffset.x = ((DOMRect.left + (DOMRect.width / 2)) - matrixStage.elements[2]) * matrixStage.elements[0];
+            // nodes[i].value.data.groupPositionOffset.y = ((DOMRect.top + (DOMRect.height / 2)) - matrixStage.elements[5]) * matrixStage.elements[4];
+            let tx = ((DOMRect.left + (DOMRect.width / 2)) - matrixStage.elements[2]);// * matrixStage.elements[0];
+            let ty = ((DOMRect.top + (DOMRect.height / 2)) - matrixStage.elements[5]);// * matrixStage.elements[4];
 
-            let matrixTranslate = new Matrix();
-            // Matrix(1, 0, 0, 0, (DOMRect.left + (DOMRect.width / 2)), (DOMRect.top + (DOMRect.height / 2)), 0, 0, 1);
-            let matrixScale = new Matrix((1-matrixStage.elements[0] * 1), 0, 0, 0, (1), 0, 0, 0, 1);
+            // kind of working !!!
+            // need to take into account x,y translation of the stage into account in the x offset calculation e.g. in the first () pair
+            // some strange interaction going on with the tx and the current scaling position
 
-            let newMatrix = Matrix.Multiply(matrixStage, matrixTranslate, matrixScale)
+            // 10 = flow x offset inside app
+            let sx = (10 + tx + matrixStage.elements[2]) * matrixStage.elements[0];
+            // let ty = (-95 + ty + matrixStage.elements[5]) * matrixStage.elements[4];
 
-            nodes[i].value.data.groupPositionOffset.x = newMatrix.elements[5];
-            nodes[i].value.data.groupPositionOffset.y = newMatrix.elements[6];
+            nodes[i].value.data.groupPositionOffset.x = sx;
+            nodes[i].value.data.groupPositionOffset.y = ty;
+            
 
- 
-            // nodes[i].value.data.groupPositionOffset.x = ((DOMRect.left + (DOMRect.width / 2)) - zuiStage.surfaceMatrix.elements[2]) * zuiStage.surfaceMatrix.elements[0];
-            // nodes[i].value.data.groupPositionOffset.y = ((DOMRect.top + (DOMRect.height / 2)) - zuiStage.surfaceMatrix.elements[5]) * zuiStage.surfaceMatrix.elements[4] ;
+            // nodes[i].value.data.groupPositionOffset.x = (1 - matrixStage.elements[0]) * (element.parent._matrix.elements[2] - matrixStage.elements[2]);
+            // nodes[i].value.data.groupPositionOffset.y = (1 - matrixStage.elements[0]) * (element.parent._matrix.elements[5] - matrixStage.elements[5]);
+            
+
+            
+            // original (working) version
+            // nodes[i].value.data.groupPositionOffset.x = ((DOMRect.left + (DOMRect.width / 2)) - matrixStage.elements[2]) * matrixStage.elements[0];
+            // nodes[i].value.data.groupPositionOffset.y = ((DOMRect.top + (DOMRect.height / 2)) - matrixStage.elements[5]) * matrixStage.elements[4];
         }
     }  
 }
@@ -479,7 +502,7 @@ function UpdateObjectGlobaltransform() {
 
 stage group m0 | m3 (should be the same value is scaled uniformly) 
 (for minimising scale)
-x' = 1-(Stage group) m0 * (child object) m4 - (stage group) m4
+x' = 1-(Stage group) m0 * ( (child object) m5 - (stage group) m5 )
 y' = 1-(stage group) m0
 
 */
@@ -492,15 +515,15 @@ function addZUI() {
     // var zuiStage = new Two.ZUI(stage); // forground elements
     // var zuiConnections = new Two.ZUI(connections); // background line connection elements
     var mouse = new Two.Vector();
-  
+    
     zuiStage.addLimits(0.06, 8);
     zuiConnections.addLimits(0.06, 8);
-  
+    
     domElement.addEventListener('mousedown', mousedown, false);
     domElement.addEventListener('mousewheel', mousewheel, {passive: true});
     domElement.addEventListener('wheel', mousewheel, {passive: true});
-
-
+    
+    
     function mousedown(e) {
         mouse.x = e.clientX;
         mouse.y = e.clientY;
@@ -522,12 +545,15 @@ function addZUI() {
         window.removeEventListener('mousemove', mousemove, false);
         window.removeEventListener('mouseup', mouseup, false);
     }
-  
+    
     function mousewheel(e) {
         if (!e.altKey) {
             var dy = (e.wheelDeltaY || - e.deltaY) / 1000;
             zuiStage.zoomBy(dy, e.clientX, e.clientY);
             zuiConnections.zoomBy(dy, e.clientX, e.clientY);
+
+            UpdateObjectGlobaltransform();
+            CreateFlowConnectionArrow();
         }
     }
-  }
+}

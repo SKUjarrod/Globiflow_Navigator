@@ -1,6 +1,7 @@
 // Made by Jarrod Adair
 //
 
+
 // All data oriented stuff in this file
 //
 // eventually All twojs visual stuff in this file
@@ -78,7 +79,7 @@ var zuiConnections = new Two.ZUI(connections); // background line connection ele
 // Create some buffer for this. When buffer updates, run this code to make new box and then remove it from buffer
 function CreateVisualElement() {
 // Creates the visual elements with twojs
-    let batchCount = objectAddBuffer.length
+    let batchCount = objectAddBuffer.length;
     let appGroup, externalEntitiesGroup;
     for (let i = 0; i < batchCount; i++) {
         let element = objectAddBuffer.pop();
@@ -108,6 +109,7 @@ function CreateVisualElement() {
 
     // connections aren't part of element group
     CreateFlowConnectionArrow();
+
 }
 
 // this order matters. determines draw layers

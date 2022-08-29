@@ -9,6 +9,8 @@
 
 could possibly salvage the podio API code by using podio api to pull data from podio about fields e.g. updating a item  gives the enum of the option selected from the catagory field in the podio app. Could use podio API to get the name of the category under the selected enum value.???????
 
+fix connections again for some apps that were working previously.
+
 switch connections over to their own object that contains all current data. This will allow for the same connection behaiour but also to incorperate some meta data like the connection name e.g. this updates this, this flow references this app
 
 convert all the object postion transforms into transformation matricies and add scaling to them
